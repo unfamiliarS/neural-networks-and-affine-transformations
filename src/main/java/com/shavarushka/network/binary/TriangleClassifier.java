@@ -1,10 +1,9 @@
-package com.shavarushka.network;
+package com.shavarushka.network.binary;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -28,11 +27,10 @@ public class TriangleClassifier {
     public static final int trainSeed = 12345;
     public static final int validationSeed = 12345;
     
-    // Вершины треугольника (можно изменить)
     private double[][] triangleVertices = {
-        {1.0, 1.0},  // точка A
-        {5.0, 1.0},  // точка B  
-        {3.0, 4.0}   // точка C
+        {1.0, 1.0},
+        {5.0, 1.0},
+        {3.0, 4.0}
     };
 
     public TriangleClassifier() {
@@ -43,13 +41,13 @@ public class TriangleClassifier {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(modelSeed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(new Adam(0.1)) // Уменьшил learning rate
+                .updater(new Adam(0.1))
                 .l2(0.001)
                 .list()
                 .layer(new DenseLayer.Builder()
                         .nIn(2)
                         .nOut(2)
-                        .activation(Activation.TANH) // Заменил RELU на TANH для лучшей сходимости
+                        .activation(Activation.TANH)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(new OutputLayer.Builder(LossFunctions.LossFunction.XENT)
@@ -69,30 +67,26 @@ public class TriangleClassifier {
         double x2 = triangleVertices[1][0], y2 = triangleVertices[1][1];
         double x3 = triangleVertices[2][0], y3 = triangleVertices[2][1];
         
-        // Вычисляем барицентрические координаты
         double denominator = ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
         double a = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / denominator;
         double b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / denominator;
         double c = 1 - a - b;
         
-        // Точка внутри треугольника, если все барицентрические координаты >= 0
         return a >= 0 && b >= 0 && c >= 0;
     }
 
     public DataSet generateDataSet(int numSamples, long seed) {
         Nd4j.getRandom().setSeed(seed);
         
-        // Создаем массивы для features и labels
         INDArray features = Nd4j.create(numSamples, 2);
-        INDArray labels = Nd4j.create(numSamples, 1); // Один выход для бинарной классификации
+        INDArray labels = Nd4j.create(numSamples, 1);
         
         int samplesPerClass = numSamples / 2;
         int insideCount = 0;
         int outsideCount = 0;
         
-        // Генерируем точки пока не наберем нужное количество для каждого класса
         while (insideCount < samplesPerClass || outsideCount < samplesPerClass) {
-            double x = Nd4j.getRandom().nextDouble() * 6.0; // Уменьшим диапазон для лучшей видимости
+            double x = Nd4j.getRandom().nextDouble() * 6.0;
             double y = Nd4j.getRandom().nextDouble() * 6.0;
             
             boolean insideTriangle = isPointInTriangle(x, y);
@@ -101,34 +95,29 @@ public class TriangleClassifier {
                 int index = insideCount + outsideCount;
                 features.putScalar(new int[]{index, 0}, x);
                 features.putScalar(new int[]{index, 1}, y);
-                labels.putScalar(new int[]{index, 0}, 1.0); // 1.0 = внутри треугольника
+                labels.putScalar(new int[]{index, 0}, 1.0);
                 insideCount++;
             } else if (!insideTriangle && outsideCount < samplesPerClass) {
                 int index = insideCount + outsideCount;
                 features.putScalar(new int[]{index, 0}, x);
                 features.putScalar(new int[]{index, 1}, y);
-                labels.putScalar(new int[]{index, 0}, 0.0); // 0.0 = снаружи треугольника
+                labels.putScalar(new int[]{index, 0}, 0.0);
                 outsideCount++;
             }
         }
         
-        // Перемешиваем данные
         int[] indices = new int[numSamples];
-        for (int i = 0; i < numSamples; i++) {
+        for (int i = 0; i < numSamples; i++)
             indices[i] = i;
-        }
         
-        // Ручное перемешивание индексов
         Random random = new Random(seed);
         for (int i = numSamples - 1; i > 0; i--) {
             int j = random.nextInt(i + 1);
-            // Меняем индексы местами
             int temp = indices[i];
             indices[i] = indices[j];
             indices[j] = temp;
         }
         
-        // Создаем перемешанные массивы
         INDArray shuffledFeatures = Nd4j.create(numSamples, 2);
         INDArray shuffledLabels = Nd4j.create(numSamples, 1);
         
@@ -141,9 +130,6 @@ public class TriangleClassifier {
         return new DataSet(shuffledFeatures, shuffledLabels);
     }
 
-    /**
-     * Обучение модели
-     */
     public void train(int numEpochs, int numSamples) {
         DataSet trainingData = generateDataSet(numSamples, trainSeed);
         
@@ -162,29 +148,18 @@ public class TriangleClassifier {
         System.out.println("Обучение завершено!");
     }
 
-    /**
-     * Предсказание для 2D точки
-     * @return true - внутри треугольника, false - снаружи
-     */
     public boolean predict(double x, double y) {
         INDArray input = Nd4j.create(new double[][]{{x, y}});
         INDArray output = model.output(input);
-        return output.getDouble(0) > 0.5; // Порог 0.5 для бинарной классификации
+        return output.getDouble(0) > 0.5;
     }
 
-    /**
-     * Предсказание с вероятностью
-     * @return вероятность того, что точка внутри треугольника
-     */
     public double predictProbability(double x, double y) {
         INDArray input = Nd4j.create(new double[][]{{x, y}});
         INDArray output = model.output(input);
         return output.getDouble(0);
     }
 
-    /**
-     * Оценка точности модели
-     */
     public void evaluate(int numTestSamples) {
         DataSet testData = generateDataSet(numTestSamples, validationSeed);
         INDArray predictions = model.output(testData.getFeatures());
@@ -206,9 +181,6 @@ public class TriangleClassifier {
                          correct, numTestSamples, accuracy);
     }
 
-    /**
-     * Тестирование на конкретных примерах
-     */
     public void testExamples() {
         double[][] testPoints = {
             {3.0, 2.0},   // Центр треугольника -> внутри
@@ -241,9 +213,6 @@ public class TriangleClassifier {
         }
     }
 
-    /**
-     * Сохранение датасета в CSV
-     */
     public void saveToCSV(DataSet dataset, String filename) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println("x,y,class,class_name");
@@ -312,16 +281,12 @@ public class TriangleClassifier {
     public static void main(String[] args) {
         TriangleClassifier classifier = new TriangleClassifier();
         
-        // Генерация и сохранение данных
         classifier.generateAndSaveDataset(1000, trainSeed, "triangle_dataset.csv");
         
-        // Обучение
         classifier.train(1000, 10000);
         
-        // Оценка
         classifier.evaluate(1000);
         
-        // Тестирование
         classifier.testExamples();
 
         classifier.printAllWeightsAndBiases();
