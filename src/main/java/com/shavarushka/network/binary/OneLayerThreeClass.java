@@ -1,4 +1,4 @@
-package com.shavarushka.network.binary;
+/* package com.shavarushka.network.binary;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -106,3 +106,4 @@ public class OneLayerThreeClass extends BinaryClassifier {
         }
     }
 }
+ */

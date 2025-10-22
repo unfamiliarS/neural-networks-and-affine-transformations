@@ -1,4 +1,4 @@
-package com.shavarushka.network.binary;
+/* package com.shavarushka.network.binary;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,26 +10,24 @@ import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 
-public abstract class BinaryClassifier {
+import com.shavarushka.network.api.Classifier;
+
+public abstract class BinaryClassifier implements Classifier {
 
     protected MultiLayerNetwork model;
 
     protected static final int modelSeed = 67890;
-    public static final int trainSeed = 12345;
-    public static final int validationSeed = 12345;
 
     public BinaryClassifier() {
-        buildModel();
+        build();
     }
 
-    protected abstract void buildModel();
+    protected abstract void build();
 
-    public abstract DataSet generateDataSet(int numSamples, long seed);
     public abstract double[] predict(double x1, double x2);
-    public abstract void saveToCSV(DataSet dataset, String filename);
 
     public void train(int numEpochs, int numSamples) {
-        DataSet trainingData = generateDataSet(numSamples, trainSeed);
+        DataSet trainingData = generateDataSet(numSamples);
         
         for (int epoch = 0; epoch < numEpochs; epoch++) {
             model.fit(trainingData);
@@ -97,3 +95,4 @@ public abstract class BinaryClassifier {
         }
     }
 }
+ */

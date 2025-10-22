@@ -8,34 +8,37 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.api.ndarray.INDArray;
+
+import com.shavarushka.network.api.Classifier;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
-public class MNISTClassifier {
+public class MNISTClassifier implements Classifier {
 
     private MultiLayerNetwork model;
     private DataSetIterator mnistTrain;
     private DataSetIterator mnistTest;
 
-    private final int numClasses = 10;
-    private final int seed = 12345;
-    private final int batchSize = 64;
+    private static final int numClasses = 10;
+    private static final int seed = 12345;
+    private static final int batchSize = 128;
 
-    public MNISTClassifier() {
-        buildModel();
+    private MNISTClassifier(MultiLayerNetwork model) {
+        this.model = model;
+        this.model.init();
     }
 
-    private void buildModel() {
+    public static MNISTClassifier build() {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -44,39 +47,49 @@ public class MNISTClassifier {
                 .list()
                 .layer(new DenseLayer.Builder()
                         .nIn(28 * 28)
-                        .nOut(512)
+                        .nOut(64)
                         .activation(Activation.RELU)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(new DenseLayer.Builder()
-                        .nIn(512)
-                        .nOut(256)
+                        .nIn(64)
+                        .nOut(32)
                         .activation(Activation.RELU)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(new DenseLayer.Builder()
-                        .nIn(256)
-                        .nOut(128)
+                        .nIn(32)
+                        .nOut(16)
                         .activation(Activation.RELU)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .nIn(128)
+                        .nIn(16)
                         .nOut(numClasses)
                         .activation(Activation.SOFTMAX)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .build();
 
-        model = new MultiLayerNetwork(config);
-        model.init();
-        model.setListeners(new ScoreIterationListener(100));
+        MultiLayerNetwork model = new MultiLayerNetwork(config);
+        return new MNISTClassifier(model);
     }
 
-    public void train(int numEpochs) throws IOException {
-        mnistTrain = new MnistDataSetIterator(batchSize, true, seed);
-        mnistTest = new MnistDataSetIterator(batchSize, false, seed);
-        
+    public static MNISTClassifier load(String filePath) {
+        try {
+            MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
+            System.out.println("Model loaded: " + filePath);
+            return new MNISTClassifier(model);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public void train(int numEpochs) {
+        initDatasetIterators();
+
         System.out.println("Starting MNIST training...");
         System.out.println("Batch size: " + batchSize);
         System.out.println("Number of epochs: " + numEpochs);
@@ -85,55 +98,47 @@ public class MNISTClassifier {
             System.out.println("Epoch: " + epoch + "/" + numEpochs);
             model.fit(mnistTrain);
             mnistTrain.reset();
-
-            evaluateAccuracy(epoch);
-        }
-        
-        System.out.println("\nFinal evaluation on test data:");
-        fullEvaluation();
+            accuracy();
+        }   
     }
 
-    private void evaluateAccuracy(int epoch) {
+    private void initDatasetIterators() {
+        try {
+            mnistTrain = new MnistDataSetIterator(batchSize, true, seed);
+            mnistTest = new MnistDataSetIterator(batchSize, false, seed);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void accuracy() {
         Evaluation eval = model.evaluate(mnistTest);
         System.out.println("Accuracy: " + String.format("%.4f", eval.accuracy()));
         mnistTest.reset();
     }
 
-    public void fullEvaluation() throws IOException {
+    @Override
+    public void evaluate() {
+        if (mnistTest == null)
+            initDatasetIterators();
+
         Evaluation evaluation = model.evaluate(mnistTest);
         System.out.println(evaluation.stats());
         System.out.println("Confusion Matrix:\n" + evaluation.confusionToString());
+        mnistTest.reset();
     }
 
-    public void testSinglePrediction() throws IOException {
-        DataSetIterator testIter = new MnistDataSetIterator(1, false, seed);
-        DataSet testData = testIter.next();
-        
-        INDArray features = testData.getFeatures();
-        INDArray labels = testData.getLabels();
-        
-        int actualLabel = labels.argMax(1).getInt(0);
-        INDArray prediction = model.output(features);
-        int predictedLabel = prediction.argMax(1).getInt(0);
-        
-        System.out.println("Test prediction:");
-        System.out.println("Actual digit: " + actualLabel);
-        System.out.println("Predicted digit: " + predictedLabel);
-        System.out.println("Probabilities: " + prediction);
-        System.out.println("Correct: " + (actualLabel == predictedLabel));
-    }
-
-    public void saveModel(String filePath) throws IOException {
-        ModelSerializer.writeModel(model, new File(filePath), true);
+    @Override
+    public void save(String filePath) {
+        try {
+            ModelSerializer.writeModel(model, new File(filePath), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println("Model saved: " + filePath);    
     }
 
-    public void loadModel(String filePath) throws IOException {
-        model = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
-        System.out.println("Model loaded: " + filePath);
-    }
-
-    public void printModelInfo() {
+    public void printInfo() {
         System.out.println("Model architecture:");
         System.out.println(model.summary());
         
@@ -144,51 +149,58 @@ public class MNISTClassifier {
         }
     }
 
-    public double[] getWeightsAsArray(int layerIndex) {
+    public double[][] getWeights(int layerIndex) {
         INDArray weights = model.getLayer(layerIndex).getParam("W");
-        return weights.data().asDouble();
-    }
-
-    public double[][] getWeightsAsMatrix(int layerIndex) {
-        INDArray weights = model.getLayer(layerIndex).getParam("W");
-        double[][] matrix = new double[weights.rows()][weights.columns()];
-        
+        double[][] weightsArray = new double[weights.rows()][weights.columns()];
         for (int i = 0; i < weights.rows(); i++) {
             for (int j = 0; j < weights.columns(); j++) {
-                matrix[i][j] = weights.getDouble(i, j);
+                weightsArray[i][j] = weights.getDouble(i, j);
             }
         }
-        return matrix;
+
+        return weightsArray;
+    }
+    
+    public double[][][] getWeights() {
+        int numLayers = model.getnLayers();
+        double[][][] weights = new double[numLayers][][];
+        for (int i = 0; i < numLayers; i++)
+            weights[i] = getWeights(i);
+
+        return weights;
     }
 
-    public static void printWeightMatrix(double[][] matrix) {
-        for (int i = 0; i < 3; i++) {
-            System.out.println("i: " + i);
-            for (int j = 0; j < 5; j++ ) {
-                System.out.println(matrix[i][j]);
-            }
+    public void setWeights(int layerIndex, double[][] newWeights) {
+        INDArray weights = model.getLayer(layerIndex).getParam("W");
+        INDArray newWeightsArray = Nd4j.create(newWeights).reshape(weights.shape());
+        model.getLayer(layerIndex).setParam("W", newWeightsArray);
+    }
+
+    public void setWeights(double[][][] allWeights) {
+        for (int i = 0; i < allWeights.length; i++)
+            setWeights(i, allWeights[i]);
+    }
+
+    public void printWeights() {
+        double[][][] matrix = getWeights();
+
+        for (int i = 0; i < matrix.length; i++) {
+            System.out.println("Layer " + i + ":");
+            double[][] weightsArray = getWeights(i);
+            for (double[] row : weightsArray)
+                System.out.println(Arrays.toString(row));
         }
     }
 
     public static void main(String[] args) {
-        try {
-            MNISTClassifier classifier = new MNISTClassifier();
-            
-            // classifier.train(6);
-            
-            // classifier.testSinglePrediction();
-            
-            // classifier.saveModel("mnist_model.dl4j");
-            
-            // classifier.printModelInfo();
-            
-            classifier.loadModel("mnist_model.dl4j");
-            double[][] matrix = classifier.getWeightsAsMatrix(3);
-            printWeightMatrix(matrix);
+        var classifier = MNISTClassifier.load("mnist-model.zip");
 
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-        }
+        classifier.evaluate();
+
+        double[][] firstWeights = classifier.getWeights(0);
+        firstWeights[0][0] = 0.0;
+        classifier.setWeights(0, firstWeights);
+
+        classifier.evaluate();
     }
 }
