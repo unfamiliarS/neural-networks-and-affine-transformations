@@ -1,5 +1,6 @@
 package com.shavarushka.network.binary;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,6 +14,7 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -236,6 +238,12 @@ public class TriangleClassifier {
         }
     }
 
+    public void saveModel(String filePath) throws IOException {
+        File modelFile = new File(filePath);
+        ModelSerializer.writeModel(model, modelFile, true);
+        System.out.println("Model saved to: " + filePath);
+    }
+
     public void generateAndSaveDataset(int numSamples, long seed, String filename) {
         DataSet dataset = generateDataSet(numSamples, seed);
         saveToCSV(dataset, filename);
@@ -278,7 +286,7 @@ public class TriangleClassifier {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         TriangleClassifier classifier = new TriangleClassifier();
         
         classifier.generateAndSaveDataset(1000, trainSeed, "triangle_dataset.csv");
@@ -295,5 +303,7 @@ public class TriangleClassifier {
         System.out.println("Вершины: A" + Arrays.toString(classifier.triangleVertices[0]) + 
                          ", B" + Arrays.toString(classifier.triangleVertices[1]) + 
                          ", C" + Arrays.toString(classifier.triangleVertices[2]));
+
+        classifier.saveModel("triangle-classifier.zip");
     }
 }
