@@ -5,18 +5,21 @@ import com.shavarushka.network.api.BaseNetwork;
 import com.shavarushka.network.api.DataIterators;
 import com.shavarushka.network.api.Trainer;
 
+import java.io.File;
 import java.io.IOException;
 
 public class MNISTClassifier {
     private BaseNetwork network;
-    private BaseEvaluator evaluator;
     private Trainer trainer;
+    private BaseEvaluator evaluator;
+    private MNISTPredictor predictor;
     private WeightManager weightManager;
 
     private MNISTClassifier(BaseNetwork network, DataIterators dataIterators) {
         this.network = network;
         this.evaluator = new MNISTEvaluator(network.getModel(), dataIterators);
         this.trainer = new MNISTTrainer(network.getModel(), dataIterators, evaluator);
+        this.predictor = new MNISTPredictor(network.getModel());
         this.weightManager = new WeightManager(network.getModel());
     }
 
@@ -61,6 +64,16 @@ public class MNISTClassifier {
         for (int i = 0; i < network.getNumLayers(); i++) {
             System.out.println("Layer " + i + ": " + 
                     weightManager.getLayerParameterCount(i) + " parameters");
+        }
+    }
+
+    public void predict(String imagePath) {
+        try {
+            File imageFile = new File(imagePath);
+            MNISTPredictor.PredictionResult result = predictor.predictDetailedFromImage(imageFile);
+            result.printDetails();
+        } catch (IOException e) {
+            System.err.println("Error loading image: " + e.getMessage());
         }
     }
 
