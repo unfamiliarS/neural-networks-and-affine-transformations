@@ -1,4 +1,4 @@
-/* package com.shavarushka.network.binary;
+package com.shavarushka.network.binary;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,30 +10,27 @@ import org.nd4j.evaluation.classification.Evaluation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 
-import com.shavarushka.network.ModelEvaluator;
-import com.shavarushka.network.ModelTrainer;
-import com.shavarushka.network.WeightManager;
-import com.shavarushka.network.api.Classifier;
-import com.shavarushka.network.api.DataIterators;
-import com.shavarushka.network.api.Network;
+public abstract class BinaryClassifier {
 
-public abstract class BinaryClassifier implements Classifier {
+    protected MultiLayerNetwork model;
 
-    protected Network networkModel;
-    protected ModelEvaluator evaluator;
-    protected ModelTrainer trainer;
-    protected WeightManager weightManager;
+    protected static final int modelSeed = 67890;
+    public static final int trainSeed = 12345;
+    public static final int validationSeed = 12345;
 
-    public BinaryClassifier(Network networkModel, DataIterators dataIterators) {
-        this.networkModel = networkModel;
-        this.evaluator = new ModelEvaluator(networkModel.getModel(), dataIterators);
-        this.trainer = new ModelTrainer(networkModel.getModel(), dataIterators, evaluator);
-        this.weightManager = new WeightManager(networkModel.getModel());
+    public BinaryClassifier() {
+        buildModel();
     }
 
-    public abstract double[] predict(double x1, double x2);
+    protected abstract void buildModel();
 
-    public void train(int numEpochs) {
+    public abstract DataSet generateDataSet(int numSamples, long seed);
+    public abstract double[] predict(double x1, double x2);
+    public abstract void saveToCSV(DataSet dataset, String filename);
+
+    public void train(int numEpochs, int numSamples) {
+        DataSet trainingData = generateDataSet(numSamples, trainSeed);
+        
         for (int epoch = 0; epoch < numEpochs; epoch++) {
             model.fit(trainingData);
             
@@ -100,4 +97,3 @@ public abstract class BinaryClassifier implements Classifier {
         }
     }
 }
- */

@@ -1,4 +1,4 @@
-/* package com.shavarushka.network.binary;
+package com.shavarushka.network.binary;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class OneLayerOneClass extends BinaryClassifier {
     }
 
     @Override
-    protected void build() {
+    protected void buildModel() {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(modelSeed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -86,4 +86,3 @@ public class OneLayerOneClass extends BinaryClassifier {
         }
     }
 }
- */
