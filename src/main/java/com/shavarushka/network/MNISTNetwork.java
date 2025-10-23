@@ -12,23 +12,21 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-import com.shavarushka.network.api.Network;
+import com.shavarushka.network.api.BaseNetwork;
 
 import java.io.File;
 import java.io.IOException;
 
-public class FullyConnectedMNISTNetwork implements Network {
+public class MNISTNetwork extends BaseNetwork {
 
-    private MultiLayerNetwork model;
     private static final int numClasses = 10;
     private static final int seed = 12345;
 
-    public FullyConnectedMNISTNetwork(MultiLayerNetwork model) {
-        this.model = model;
-        this.model.init();
+    public MNISTNetwork(MultiLayerNetwork model) {
+        super(model);
     }
 
-    public static Network create() {
+    public static MNISTNetwork create() {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -62,29 +60,12 @@ public class FullyConnectedMNISTNetwork implements Network {
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(config);
-        return new FullyConnectedMNISTNetwork(model);
+        return new MNISTNetwork(model);
     }
 
-    public static FullyConnectedMNISTNetwork load(String filePath) throws IOException {
+    public static MNISTNetwork load(String filePath) throws IOException {
         MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
         System.out.println("Model loaded: " + filePath);
-        return new FullyConnectedMNISTNetwork(model);
-    }
-
-    public void save(String filePath) throws IOException {
-        ModelSerializer.writeModel(model, new File(filePath), true);
-        System.out.println("Model saved: " + filePath);
-    }
-
-    public MultiLayerNetwork getModel() {
-        return model;
-    }
-
-    public String getSummary() {
-        return model.summary();
-    }
-
-    public int getNumLayers() {
-        return model.getnLayers();
+        return new MNISTNetwork(model);
     }
 }

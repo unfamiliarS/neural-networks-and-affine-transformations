@@ -3,14 +3,16 @@ package com.shavarushka.network;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 
+import com.shavarushka.network.api.BaseEvaluator;
 import com.shavarushka.network.api.DataIterators;
+import com.shavarushka.network.api.Trainer;
 
-public class ModelTrainer {
+public class MNISTTrainer implements Trainer {
     private MultiLayerNetwork model;
     private DataIterators dataManager;
-    private ModelEvaluator evaluator;
+    private BaseEvaluator evaluator;
 
-    public ModelTrainer(MultiLayerNetwork model, DataIterators dataManager, ModelEvaluator evaluator) {
+    public MNISTTrainer(MultiLayerNetwork model, DataIterators dataManager, BaseEvaluator evaluator) {
         this.model = model;
         this.dataManager = dataManager;
         this.evaluator = evaluator;

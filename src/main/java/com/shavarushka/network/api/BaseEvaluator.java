@@ -1,26 +1,14 @@
-package com.shavarushka.network;
+package com.shavarushka.network.api;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-
-import com.shavarushka.network.api.DataIterators;
-
 import org.nd4j.evaluation.classification.Evaluation;
 
-public class ModelEvaluator {
-    private MultiLayerNetwork model;
-    private DataIterators dataIterators;
+public abstract class BaseEvaluator implements Evaluator {
 
-    public ModelEvaluator(MultiLayerNetwork model, DataIterators dataIterators) {
+    protected MultiLayerNetwork model;
+
+    public BaseEvaluator(MultiLayerNetwork model) {
         this.model = model;
-        this.dataIterators = dataIterators;
-    }
-
-    public Evaluation evaluate() {
-        DataSetIterator testIterator = dataIterators.getTestIterator();
-        Evaluation evaluation = model.evaluate(testIterator);
-        dataIterators.resetTestIterator();
-        return evaluation;
     }
 
     public void printEvaluation() {

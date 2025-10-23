@@ -1,49 +1,64 @@
 package com.shavarushka.network;
 
-import com.shavarushka.network.api.Classifier;
+import com.shavarushka.network.api.BaseEvaluator;
+import com.shavarushka.network.api.BaseNetwork;
 import com.shavarushka.network.api.DataIterators;
-import com.shavarushka.network.api.Network;
+import com.shavarushka.network.api.Trainer;
 
 import java.io.IOException;
 
-public class MNISTClassifier implements Classifier {
-    private Network networkModel;
-    private ModelEvaluator evaluator;
-    private ModelTrainer trainer;
+public class MNISTClassifier {
+    private BaseNetwork network;
+    private BaseEvaluator evaluator;
+    private Trainer trainer;
     private WeightManager weightManager;
 
-    public MNISTClassifier(Network networkModel, DataIterators dataIterators) {
-        this.networkModel = networkModel;
-        this.evaluator = new ModelEvaluator(networkModel.getModel(), dataIterators);
-        this.trainer = new ModelTrainer(networkModel.getModel(), dataIterators, evaluator);
-        this.weightManager = new WeightManager(networkModel.getModel());
+    private MNISTClassifier(BaseNetwork network, DataIterators dataIterators) {
+        this.network = network;
+        this.evaluator = new MNISTEvaluator(network.getModel(), dataIterators);
+        this.trainer = new MNISTTrainer(network.getModel(), dataIterators, evaluator);
+        this.weightManager = new WeightManager(network.getModel());
     }
 
-    @Override
-    public void train(int numEpochs) {
-        trainer.train(numEpochs);
+    public static MNISTClassifier create() {
+        BaseNetwork model = MNISTNetwork.create();
+        DataIterators dataManager = new MNISTDataIterators();
+        return new MNISTClassifier(model, dataManager);
     }
 
-    @Override
-    public void evaluate() {
-        evaluator.printEvaluation();
+    public static MNISTClassifier load(String filePath) {
+        try {
+            BaseNetwork model = MNISTNetwork.load(filePath);
+            DataIterators dataManager = new MNISTDataIterators();
+            return new MNISTClassifier(model, dataManager);
+        } catch (Exception e) {
+            System.err.println("Failed to load model: " + e.getMessage());
+            return null;
+        }
     }
 
-    @Override
     public void save(String filePath) {
         try {
-            networkModel.save(filePath);
+            network.save(filePath);
         } catch (IOException e) {
             System.err.println("Failed to save model: " + e.getMessage());
         }
     }
 
+    public void train(int numEpochs) {
+        trainer.train(numEpochs);
+    }
+
+    public void evaluate() {
+        evaluator.printEvaluation();
+    }
+
     public void printInfo() {
         System.out.println("Model architecture:");
-        System.out.println(networkModel.getSummary());
+        System.out.println(network.getSummary());
         
         System.out.println("\nLayer parameters:");
-        for (int i = 0; i < networkModel.getNumLayers(); i++) {
+        for (int i = 0; i < network.getNumLayers(); i++) {
             System.out.println("Layer " + i + ": " + 
                     weightManager.getLayerParameterCount(i) + " parameters");
         }
