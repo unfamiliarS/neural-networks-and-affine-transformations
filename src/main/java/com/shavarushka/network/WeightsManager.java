@@ -6,11 +6,11 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
 
-public class WeightManager {
+public class WeightsManager {
     
     private MultiLayerNetwork model;
 
-    public WeightManager(MultiLayerNetwork model) {
+    public WeightsManager(MultiLayerNetwork model) {
         this.model = model;
     }
 

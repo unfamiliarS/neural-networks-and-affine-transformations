@@ -1,19 +1,18 @@
 package com.shavarushka.network;
 
-import com.shavarushka.affine.AffineTransformations;
+import java.io.File;
+import java.io.IOException;
+
+import com.shavarushka.network.api.ModelImagePredictorExtended;
+import com.shavarushka.network.api.ModelNetwork;
+import com.shavarushka.network.api.PredictionResult;
 
 public class Main {
-    public static void main(String[] args) {
-        MNISTClassifier classifier = MNISTClassifier.load("src/main/resources/mnist-model.zip");
-
-        double[][][] allWeights = classifier.getWeights();
+    public static void main(String[] args) throws IOException {
+        ModelNetwork network = ModelNetwork.load("src/main/resources/mnist-model.zip");
         
-        double[][] rotatedWeights;
-        for (int i = 0; i < allWeights.length; i++) {
-            rotatedWeights = AffineTransformations.rotate(allWeights[i], 90);
-            classifier.setWeights(i, rotatedWeights);
-        }
-
-        classifier.predict(null);
+        ModelImagePredictorExtended predictor = new MNISTPredictor(network.getModel());
+        PredictionResult result = predictor.predictDetailedFromImage(new File("src/main/resources/mnist-nums/8_005839.png"));
+        result.printDetails();
     }
 }

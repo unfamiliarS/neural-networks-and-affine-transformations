@@ -7,22 +7,18 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-import com.shavarushka.network.api.BaseNetwork;
+import com.shavarushka.network.api.ModelNetwork;
 
-import java.io.File;
-import java.io.IOException;
-
-public class MNISTNetwork extends BaseNetwork {
+public class MNISTNetwork extends ModelNetwork {
 
     private static final int numClasses = 10;
     private static final int seed = 12345;
 
-    public MNISTNetwork(MultiLayerNetwork model) {
+    protected MNISTNetwork(MultiLayerNetwork model) {
         super(model);
     }
 
@@ -60,12 +56,6 @@ public class MNISTNetwork extends BaseNetwork {
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(config);
-        return new MNISTNetwork(model);
-    }
-
-    public static MNISTNetwork load(String filePath) throws IOException {
-        MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
-        System.out.println("Model loaded: " + filePath);
         return new MNISTNetwork(model);
     }
 }

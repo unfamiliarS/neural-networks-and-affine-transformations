@@ -3,11 +3,11 @@ package com.shavarushka.network.api;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.evaluation.classification.Evaluation;
 
-public abstract class BaseEvaluator implements Evaluator {
+public abstract class ModelEvaluator implements Evaluator {
 
     protected MultiLayerNetwork model;
 
-    public BaseEvaluator(MultiLayerNetwork model) {
+    public ModelEvaluator(MultiLayerNetwork model) {
         this.model = model;
     }
 
@@ -17,13 +17,13 @@ public abstract class BaseEvaluator implements Evaluator {
         System.out.println("Confusion Matrix:\n" + evaluation.confusionToString());
     }
 
-    public double calculateAccuracy() {
-        Evaluation evaluation = evaluate();
-        return evaluation.accuracy();
-    }
-
     public void printAccuracy() {
         double accuracy = calculateAccuracy();
         System.out.println("Accuracy: " + String.format("%.4f", accuracy));
+    }
+    
+    public double calculateAccuracy() {
+        Evaluation evaluation = evaluate();
+        return evaluation.accuracy();
     }
 }
