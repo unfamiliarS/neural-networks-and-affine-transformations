@@ -28,7 +28,7 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
         double[] flatArray = flattenAndNormalize(imageData);
         INDArray input = Nd4j.create(flatArray, new int[]{1, 784});
         INDArray output = model.output(input);
-        
+
         return output.toDoubleVector();
     }
 
@@ -41,7 +41,7 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
         double[] probabilities = predict(imageData);
         int predictedDigit = argMax(probabilities);
         double confidence = probabilities[predictedDigit];
-        
+
         return new PredictionResult(predictedDigit, confidence, probabilities);
     }
 
@@ -58,7 +58,7 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
     private double[] flattenAndNormalize(double[][] imageData) {
         double[] result = new double[28 * 28];
         int index = 0;
-        
+
         for (int i = 0; i < 28; i++) {
             for (int j = 0; j < 28; j++) {
                 result[index++] = imageData[i][j] / 255.0;
@@ -69,11 +69,11 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
 
     private double[][] loadAndPreprocessImage(File imageFile) throws IOException {
         BufferedImage image = ImageIO.read(imageFile);
-        
+
         BufferedImage processedImage = preprocessImage(image);
-        
+
         double[][] imageData = new double[28][28];
-        
+
         for (int y = 0; y < 28; y++) {
             for (int x = 0; x < 28; x++) {
                 int rgb = processedImage.getRGB(x, y);
@@ -81,29 +81,29 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
                 imageData[y][x] = gray;
             }
         }
-        
+
         return imageData;
     }
 
     private BufferedImage preprocessImage(BufferedImage image) {
-        if (image.getWidth() == 28 && image.getHeight() == 28 && 
+        if (image.getWidth() == 28 && image.getHeight() == 28 &&
             image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
             return image;
         }
-        
+
         BufferedImage processed = new BufferedImage(28, 28, BufferedImage.TYPE_BYTE_GRAY);
         java.awt.Graphics2D g = processed.createGraphics();
-        
+
         g.drawImage(image, 0, 0, 28, 28, null);
         g.dispose();
-        
+
         return processed;
     }
 
     private int argMax(double[] array) {
         int maxIndex = 0;
         double maxValue = array[0];
-        
+
         for (int i = 1; i < array.length; i++) {
             if (array[i] > maxValue) {
                 maxValue = array[i];

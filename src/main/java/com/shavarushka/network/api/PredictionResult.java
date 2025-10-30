@@ -1,7 +1,7 @@
 package com.shavarushka.network.api;
 
 public class PredictionResult {
-    
+
     private final int predictedDigit;
     private final double confidence;
     private final double[] probabilities;

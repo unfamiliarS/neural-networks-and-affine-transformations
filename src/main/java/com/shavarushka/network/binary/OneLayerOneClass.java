@@ -53,7 +53,7 @@ public class OneLayerOneClass extends BinaryClassifier {
     public DataSet generateDataSet(int numSamples, long seed) {
         Nd4j.getRandom().setSeed(seed);
         INDArray features = Nd4j.randn(numSamples, 2);
-        
+
         // class = 1 if x1 + x2 >= 0
         INDArray labels = Nd4j.create(numSamples, 1);
         for (int i = 0; i < numSamples; i++) {
@@ -62,24 +62,24 @@ public class OneLayerOneClass extends BinaryClassifier {
             double label = (x1 + x2 >= 0) ? 1.0 : 0.0;
             labels.putScalar(i, 0, label);
         }
-        
+
         return new DataSet(features, labels);
     }
 
     public void saveToCSV(DataSet dataset, String filename) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println("x1,x2,label");
-            
+
             INDArray features = dataset.getFeatures();
             INDArray labels = dataset.getLabels();
-            
+
             for (int i = 0; i < features.rows(); i++) {
                 double x1 = features.getDouble(i, 0);
                 double x2 = features.getDouble(i, 1);
                 double label = labels.getDouble(i, 0);
                 writer.printf("%.6f,%.6f,%.0f%n", x1, x2, label);
             }
-            
+
             System.out.println("Датасет сохранен в: " + filename);
         } catch (IOException e) {
             System.err.println("Ошибка при сохранении датасета: " + e.getMessage());

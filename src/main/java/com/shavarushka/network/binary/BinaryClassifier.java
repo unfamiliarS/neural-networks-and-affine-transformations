@@ -30,10 +30,10 @@ public abstract class BinaryClassifier {
 
     public void train(int numEpochs, int numSamples) {
         DataSet trainingData = generateDataSet(numSamples, trainSeed);
-        
+
         for (int epoch = 0; epoch < numEpochs; epoch++) {
             model.fit(trainingData);
-            
+
             if (epoch % 10 == 0)
                 System.out.println("Epoch " + epoch + ", Loss: " + model.score());
         }
@@ -42,10 +42,10 @@ public abstract class BinaryClassifier {
     public void evaluate(int testSamples) {
         DataSet testData = generateDataSet(testSamples, validationSeed);
         Evaluation eval = new Evaluation();
-        
+
         INDArray output = model.output(testData.getFeatures());
         eval.eval(testData.getLabels(), output);
-        
+
         System.out.println("\n=== Evaluation Results ===");
         System.out.println(eval.stats());
     }

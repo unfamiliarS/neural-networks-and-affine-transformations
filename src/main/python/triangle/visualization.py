@@ -15,7 +15,7 @@ bias_layer1 = [-5.169458389282227]
 plt.figure(figsize=(12, 8))
 
 colors = ['blue' if cls == 0 else 'red' for cls in df['class']]
-plt.scatter(df['x'], df['y'], c=colors, alpha=0.7, s=30, 
+plt.scatter(df['x'], df['y'], c=colors, alpha=0.7, s=30,
            edgecolors='black', linewidth=0.5)
 
 plt.scatter([], [], c='blue', alpha=0.7, s=30, label='Внутри треугольника (0)')
@@ -32,16 +32,16 @@ for neuron_idx in range(2):
     w1 = weights_layer0[0][neuron_idx]
     w2 = weights_layer0[1][neuron_idx]
     b = biases_layer0[neuron_idx]
-    
+
     if abs(w2) > 1e-6:
         y_line = (-w1 * x_range - b) / w2
         valid_indices = (y_line >= y_min) & (y_line <= y_max)
         if np.any(valid_indices):
-            plt.plot(x_range[valid_indices], y_line[valid_indices], linewidth=2, alpha=0.8, 
+            plt.plot(x_range[valid_indices], y_line[valid_indices], linewidth=2, alpha=0.8,
                     label=f'Нейрон скрытого слоя {neuron_idx}')
 
 w1_out = weights_layer1[0]
-w2_out = weights_layer1[1]  
+w2_out = weights_layer1[1]
 b_out = bias_layer1[0]
 
 if abs(w2_out) > 1e-6:

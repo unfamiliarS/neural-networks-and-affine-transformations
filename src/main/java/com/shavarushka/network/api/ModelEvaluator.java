@@ -21,7 +21,7 @@ public abstract class ModelEvaluator implements Evaluator {
         double accuracy = calculateAccuracy();
         System.out.println("Accuracy: " + String.format("%.4f", accuracy));
     }
-    
+
     public double calculateAccuracy() {
         Evaluation evaluation = evaluate();
         return evaluation.accuracy();

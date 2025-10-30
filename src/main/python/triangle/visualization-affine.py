@@ -27,7 +27,7 @@ plt.figure(figsize=(15, 6))
 # 1. Исходные данные
 plt.subplot(1, 2, 1)
 colors = ['blue' if cls == 0 else 'red' for cls in df['class']]
-plt.scatter(df['x'], df['y'], c=colors, alpha=0.7, s=30, 
+plt.scatter(df['x'], df['y'], c=colors, alpha=0.7, s=30,
            edgecolors='black', linewidth=0.5)
 
 plt.scatter([], [], c='blue', alpha=0.7, s=30, label='Внутри треугольника (0)')
@@ -41,13 +41,13 @@ for neuron_idx in range(2):
     w1 = weights_layer0[0][neuron_idx]
     w2 = weights_layer0[1][neuron_idx]
     b = biases_layer0[neuron_idx]
-    
+
     if abs(w2) > 1e-6:
         y_line = (-w1 * x_range - b) / w2
         valid_indices = (y_line >= y_min) & (y_line <= y_max)
         valid_indices = valid_indices & ~np.isnan(y_line)
         if np.any(valid_indices):
-            plt.plot(x_range[valid_indices], y_line[valid_indices], linewidth=2, alpha=0.8, 
+            plt.plot(x_range[valid_indices], y_line[valid_indices], linewidth=2, alpha=0.8,
                     label=f'Нейрон {neuron_idx}')
 
 plt.xlim(x_min, x_max)
@@ -61,7 +61,7 @@ plt.grid(True, alpha=0.3)
 
 # 2. Данные после аффинного преобразования (растяжения)
 plt.subplot(1, 2, 2)
-plt.scatter(points_transformed[:, 0], points_transformed[:, 1], c=colors, alpha=0.7, s=30, 
+plt.scatter(points_transformed[:, 0], points_transformed[:, 1], c=colors, alpha=0.7, s=30,
            edgecolors='black', linewidth=0.5)
 
 plt.scatter([], [], c='blue', alpha=0.7, s=30, label='Внутри треугольника (0)')
@@ -78,13 +78,13 @@ for neuron_idx in range(2):
     w1_t = weights_layer0_transformed[0, neuron_idx]
     w2_t = weights_layer0_transformed[1, neuron_idx]
     b_t = biases_layer0[neuron_idx]
-    
+
     if abs(w2_t) > 1e-6:
         y_line_t = (-w1_t * x_range_t - b_t) / w2_t
         valid_indices = (y_line_t >= y_min_t) & (y_line_t <= y_max_t)
         valid_indices = valid_indices & ~np.isnan(y_line_t)
         if np.any(valid_indices):
-            plt.plot(x_range_t[valid_indices], y_line_t[valid_indices], linewidth=2, alpha=0.8, 
+            plt.plot(x_range_t[valid_indices], y_line_t[valid_indices], linewidth=2, alpha=0.8,
                     label=f'Нейрон {neuron_idx} (преобр.)')
 
 plt.xlim(x_min_t, x_max_t)

@@ -19,16 +19,16 @@ public class MNISTTrainer extends ModelTrainer {
     @Override
     public void train(int numEpochs) {
         DataSetIterator trainIterator = dataIterators.getTrainIterator();
-        
+
         System.out.println("Starting MNIST training...");
         System.out.println("Batch size: " + dataIterators.getBatchSize());
         System.out.println("Number of epochs: " + numEpochs);
-        
+
         for (int epoch = 1; epoch <= numEpochs; epoch++) {
             System.out.println("Epoch: " + epoch + "/" + numEpochs);
             model.fit(trainIterator);
             dataIterators.resetTrainIterator();
             evaluator.printAccuracy();
-        }   
+        }
     }
 }

@@ -14,9 +14,9 @@ plt.figure(figsize=(12, 8))
 
 # 1. Отображение точек датасета
 colors = ['red' if label == 0 else 'blue' for label in df['label']]
-plt.scatter(df['x1'], df['x2'], c=colors, alpha=0.7, s=30, 
+plt.scatter(df['x1'], df['x2'], c=colors, alpha=0.7, s=30,
            label='Класс 0 (красный)', edgecolors='black', linewidth=0.5)
-plt.scatter([], [], c='blue', alpha=0.7, s=30, 
+plt.scatter([], [], c='blue', alpha=0.7, s=30,
            label='Класс 1 (синий)', edgecolors='black', linewidth=0.5)
 
 plt.xlabel('x1')
@@ -35,9 +35,9 @@ b = layer1_biases
 # Выражаем x2 через x1: x2 = (-w1*x1 - b) / w2
 if w2 != 0:
     x2_line = (-w1 * x1_range - b) / w2
-    
-    plt.plot(x1_range, x2_line, 
-            color='green', 
+
+    plt.plot(x1_range, x2_line,
+            color='green',
             linestyle='-',
             linewidth=2.5,
             label='Нейрон 0')
@@ -47,4 +47,3 @@ plt.tight_layout()
 
 plt.savefig('one-class.png', dpi=300, bbox_inches='tight')
 plt.show()
-    

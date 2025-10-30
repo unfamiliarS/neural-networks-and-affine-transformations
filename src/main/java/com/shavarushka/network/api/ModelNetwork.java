@@ -7,7 +7,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.util.ModelSerializer;
 
 public class ModelNetwork implements Savier {
-    
+
     protected MultiLayerNetwork model;
 
     protected ModelNetwork(MultiLayerNetwork model) {
