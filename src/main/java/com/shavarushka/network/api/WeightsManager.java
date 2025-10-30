@@ -1,4 +1,4 @@
-package com.shavarushka.network;
+package com.shavarushka.network.api;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;

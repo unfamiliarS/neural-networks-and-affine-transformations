@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.shavarushka.network.api.ModelImagePredictorExtended;
 import com.shavarushka.network.api.ModelNetwork;
 import com.shavarushka.network.api.PredictionResult;
+import com.shavarushka.network.mnist.MNISTPredictor;
 
 public class Main {
     public static void main(String[] args) throws IOException {

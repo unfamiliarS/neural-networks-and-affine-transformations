@@ -1,4 +1,4 @@
-package com.shavarushka.network;
+package com.shavarushka.network.mnist;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
