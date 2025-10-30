@@ -1,18 +1,14 @@
-package com.shavarushka.network.mnist;
+package com.shavarushka.network.api;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
-
-import com.shavarushka.network.api.ModelEvaluator;
-import com.shavarushka.network.api.DataIterators;
-
 import org.nd4j.evaluation.classification.Evaluation;
 
-public class MNISTEvaluator extends ModelEvaluator {
+public class IteratorDataEvaluator extends ModelEvaluator {
 
     private DataIterators dataIterators;
 
-    public MNISTEvaluator(MultiLayerNetwork model, DataIterators dataIterators) {
+    public IteratorDataEvaluator(MultiLayerNetwork model, DataIterators dataIterators) {
         super(model);
         this.dataIterators = dataIterators;
     }

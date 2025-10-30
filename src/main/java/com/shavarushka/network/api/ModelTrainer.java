@@ -2,7 +2,7 @@ package com.shavarushka.network.api;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 
-public abstract class ModelTrainer implements Trainer {
+public abstract class ModelTrainer {
 
     protected MultiLayerNetwork model;
     protected ModelEvaluator evaluator;
@@ -11,4 +11,6 @@ public abstract class ModelTrainer implements Trainer {
         this.model = model;
         this.evaluator = evaluator;
     }
+
+    public abstract void train(int numEpochs);
 }
