@@ -28,9 +28,9 @@ public class WeightsManager {
     public double[][][] getAllWeights() {
         int numLayers = model.getnLayers();
         double[][][] weights = new double[numLayers][][];
-        for (int i = 0; i < numLayers; i++) {
+        for (int i = 0; i < numLayers; i++)
             weights[i] = getLayerWeights(i);
-        }
+
         return weights;
     }
 

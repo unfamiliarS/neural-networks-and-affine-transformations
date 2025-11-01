@@ -3,9 +3,8 @@ package com.shavarushka.affine;
 public class Rotation {
 
     public static double[][] rotate(double[][] weightMatrix, int axis1, int axis2, double angleDegrees) {
-        if (weightMatrix == null || weightMatrix.length == 0) {
+        if (weightMatrix == null || weightMatrix.length == 0)
             return new double[0][0];
-        }
 
         double[][] hyperplanes = extractHyperplanes(weightMatrix);
 
@@ -21,11 +20,9 @@ public class Rotation {
 
         double[][] hyperplanes = new double[numCols][numRows];
 
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numCols; j++) {
+        for (int i = 0; i < numRows; i++)
+            for (int j = 0; j < numCols; j++)
                 hyperplanes[j][i] = weightMatrix[i][j];
-            }
-        }
 
         return hyperplanes;
     }
@@ -36,11 +33,9 @@ public class Rotation {
 
         double[][] weightMatrix = new double[numCoords][numPlanes];
 
-        for (int i = 0; i < numCoords; i++) {
-            for (int j = 0; j < numPlanes; j++) {
+        for (int i = 0; i < numCoords; i++)
+            for (int j = 0; j < numPlanes; j++)
                 weightMatrix[i][j] = hyperplanes[j][i];
-            }
-        }
 
         return weightMatrix;
     }
@@ -49,17 +44,15 @@ public class Rotation {
         int n = coordinates[0].length;
         int points = coordinates.length;
 
-        if (axis1 < 0 || axis1 >= n || axis2 < 0 || axis2 >= n || axis1 == axis2) {
+        if (axis1 < 0 || axis1 >= n || axis2 < 0 || axis2 >= n || axis1 == axis2)
             throw new IllegalArgumentException("Invalid rotation axes");
-        }
 
         double[][] rotationMatrix = createRotationMatrix(n, axis1, axis2, angle);
 
         double[][] rotated = new double[points][n];
 
-        for (int p = 0; p < points; p++) {
+        for (int p = 0; p < points; p++)
             rotated[p] = multiplyMatrixVector(rotationMatrix, coordinates[p]);
-        }
 
         return rotated;
     }
@@ -67,11 +60,9 @@ public class Rotation {
     private static double[][] createRotationMatrix(int dimensions, int axis1, int axis2, double angle) {
         double[][] matrix = new double[dimensions][dimensions];
 
-        for (int i = 0; i < dimensions; i++) {
-            for (int j = 0; j < dimensions; j++) {
+        for (int i = 0; i < dimensions; i++)
+            for (int j = 0; j < dimensions; j++)
                 matrix[i][j] = (i == j) ? 1.0 : 0.0;
-            }
-        }
 
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
@@ -90,9 +81,9 @@ public class Rotation {
 
         for (int i = 0; i < n; i++) {
             double sum = 0.0;
-            for (int j = 0; j < n; j++) {
+            for (int j = 0; j < n; j++)
                 sum += matrix[i][j] * vector[j];
-            }
+   
             result[i] = sum;
         }
 

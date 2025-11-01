@@ -11,18 +11,12 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
-import com.shavarushka.network.api.ModelNetwork;
-
-public class MNISTNetwork extends ModelNetwork {
+public class MNISTNetwork {
 
     private static final int numClasses = 10;
     private static final int seed = 12345;
 
-    protected MNISTNetwork(MultiLayerNetwork model) {
-        super(model);
-    }
-
-    public static MNISTNetwork create() {
+    public static MultiLayerNetwork create() {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -56,6 +50,6 @@ public class MNISTNetwork extends ModelNetwork {
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(config);
-        return new MNISTNetwork(model);
+        return model;
     }
 }

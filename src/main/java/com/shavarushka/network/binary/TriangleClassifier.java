@@ -39,6 +39,10 @@ public class TriangleClassifier {
         buildModel();
     }
 
+    public TriangleClassifier(MultiLayerNetwork model) {
+        this.model = model;
+    }
+
     protected void buildModel() {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(modelSeed)
@@ -183,6 +187,17 @@ public class TriangleClassifier {
                          correct, numTestSamples, accuracy);
     }
 
+    public static TriangleClassifier load(String filePath) {
+        try {
+            MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
+            System.out.println("Model loaded: " + filePath);
+            return new TriangleClassifier(model);
+        } catch (IOException e) {
+            System.err.println("Failed to load model: " + e.getMessage());
+            return null;
+        }
+    }
+
     public void testExamples() {
         double[][] testPoints = {
             {3.0, 2.0},   // Центр треугольника -> внутри
@@ -287,11 +302,9 @@ public class TriangleClassifier {
     }
 
     public static void main(String[] args) throws IOException {
-        TriangleClassifier classifier = new TriangleClassifier();
+        TriangleClassifier classifier = TriangleClassifier.load("src/main/resources/triangle-classifier.zip");
 
         classifier.generateAndSaveDataset(1000, trainSeed, "triangle_dataset.csv");
-
-        classifier.train(1000, 10000);
 
         classifier.evaluate(1000);
 
@@ -304,6 +317,5 @@ public class TriangleClassifier {
                          ", B" + Arrays.toString(classifier.triangleVertices[1]) +
                          ", C" + Arrays.toString(classifier.triangleVertices[2]));
 
-        classifier.saveModel("triangle-classifier.zip");
     }
 }
