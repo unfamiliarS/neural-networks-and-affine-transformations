@@ -26,8 +26,8 @@ rotation_matrix = np.array([
 ])
 
 points_original = df[['x', 'y']].values
-points_scaled = points_original @ transform_matrix_scale.T
-points_rotated = points_original @ rotation_matrix.T
+points_scaled = points_original @ transform_matrix_scale
+points_rotated = points_original @ rotation_matrix
 
 plt.figure(figsize=(20, 6))
 
@@ -114,7 +114,7 @@ y_min_r, y_max_r = np.nanmin(points_rotated[:, 1]) - 0.5, np.nanmax(points_rotat
 x_range_r = np.linspace(x_min_r, x_max_r, 100)
 
 # Преобразуем веса для поворота
-weights_layer0_rotated = np.array(rotation_matrix) @ np.array(weights_layer0)
+weights_layer0_rotated = np.array(weights_layer0) @ np.array(rotation_matrix)
 
 for neuron_idx in range(2):
     w1_r = weights_layer0_rotated[0, neuron_idx]

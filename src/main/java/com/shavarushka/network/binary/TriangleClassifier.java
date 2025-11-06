@@ -1,10 +1,14 @@
 package com.shavarushka.network.binary;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
@@ -21,6 +25,10 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+
+import com.shavarushka.affine.AffineTransformations;
+import com.shavarushka.affine.MatrixUtils;
+import com.shavarushka.network.api.WeightsManager;
 
 public class TriangleClassifier {
 
@@ -288,7 +296,6 @@ public class TriangleClassifier {
                 System.out.println(Arrays.toString(row));
             }
 
-            // Получаем смещения слоя
             INDArray biases = model.getLayer(layerIndex).getParam("b");
             double[] biasesArray = new double[(int) biases.length()];
 
@@ -301,25 +308,80 @@ public class TriangleClassifier {
         }
     }
 
+
     public MultiLayerNetwork getModel() {
         return model;
     }
 
+    public void setModel(MultiLayerNetwork network) {
+        model = network;
+    }
+
+    public static double[][] getDataSetFromCSV(String filename) throws IOException {
+        List<double[]> pointsList = new ArrayList<>();
+        
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            boolean isFirstLine = true;
+            
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+                
+                String[] parts = line.split(",");
+                if (parts.length >= 2) {
+                    try {
+                        double x = Double.parseDouble(parts[0].trim());
+                        double y = Double.parseDouble(parts[1].trim());
+                        
+                        pointsList.add(new double[]{x, y});
+                    } catch (NumberFormatException e) {
+                        System.err.println("Ошибка парсинга чисел в строке: " + line);
+                    }
+                }
+            }
+        }
+        
+        double[][] pointsArray = new double[pointsList.size()][2];
+        for (int i = 0; i < pointsList.size(); i++) {
+            pointsArray[i] = pointsList.get(i);
+        }
+        
+        return pointsArray;
+    }
+
     public static void main(String[] args) throws IOException {
         TriangleClassifier classifier = TriangleClassifier.load("src/main/resources/triangle-classifier.zip");
+        MultiLayerNetwork network = classifier.getModel();
+        WeightsManager weightsManager = new WeightsManager(network);
 
-        classifier.generateAndSaveDataset(1000, trainSeed, "triangle_dataset.csv");
+        double rotationDegr = 180;
 
-        classifier.evaluate(1000);
+        double[][] dataset = getDataSetFromCSV("src/main/python/triangle/dataset.csv");
+        double[][] rotatedDataSet = AffineTransformations.strictRotate(dataset, 0, 1, rotationDegr);
 
-        classifier.testExamples();
+        for (int i = 0; i < 20; i++)
+            System.out.println(Arrays.toString(dataset[i]));
 
-        classifier.printAllWeightsAndBiases();
+        System.out.println();
 
-        System.out.println("\n=== Информация о треугольнике ===");
-        System.out.println("Вершины: A" + Arrays.toString(classifier.triangleVertices[0]) +
-                         ", B" + Arrays.toString(classifier.triangleVertices[1]) +
-                         ", C" + Arrays.toString(classifier.triangleVertices[2]));
+        for (int i = 0; i < 20; i++)
+            System.out.println(Arrays.toString(rotatedDataSet[i]));
+            
+        System.out.println();
 
+        double[] rotatedDataSetSample = rotatedDataSet[4];
+        System.out.println(classifier.predict(rotatedDataSetSample[0], rotatedDataSetSample[1]));
+        System.out.println(classifier.predictProbability(rotatedDataSetSample[0], rotatedDataSetSample[1]));
+
+        double[][][] allWeights = weightsManager.getAllWeights();
+        double[][] rotatedWeights = AffineTransformations.strictRotate(allWeights[0], 0, 1, rotationDegr);
+        weightsManager.setLayerWeights(0, rotatedWeights);
+
+        System.out.println();
+        System.out.println(classifier.predict(rotatedDataSetSample[0], rotatedDataSetSample[1]));
+        System.out.println(classifier.predictProbability(rotatedDataSetSample[0], rotatedDataSetSample[1]));
     }
 }

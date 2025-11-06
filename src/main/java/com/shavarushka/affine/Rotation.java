@@ -2,6 +2,16 @@ package com.shavarushka.affine;
 
 public class Rotation {
 
+    public static double[][] strictRotate(double[][] matrix, int axis1, int axis2, double angleDegrees) {
+        if (matrix == null || matrix.length == 0)
+            return new double[0][0];
+
+        double angleRadians = Math.toRadians(angleDegrees);
+        double[][] rotatedMatrix = applyRotation(matrix, axis1, axis2, angleRadians);
+
+        return rotatedMatrix;
+    }
+
     public static double[][] rotate(double[][] weightMatrix, int axis1, int axis2, double angleDegrees) {
         if (weightMatrix == null || weightMatrix.length == 0)
             return new double[0][0];

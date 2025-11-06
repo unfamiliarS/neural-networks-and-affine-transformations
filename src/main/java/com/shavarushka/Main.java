@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.cpu.nativecpu.bindings.Nd4jCpu.in_top_k;
 
 import com.shavarushka.affine.AffineTransformations;
 import com.shavarushka.affine.MatrixUtils;
@@ -21,37 +20,44 @@ public class Main {
         ModelImagePredictorExtended predictor = new MNISTPredictor(network);
 
         double rotationDegr = 180;
+        int axis1 = 3, axis2 = 10;
 
-        double[][] imageData = predictor.load(new File("src/main/resources/mnist-nums/5_000021.png"));
-        double[][] rotatedImageData = AffineTransformations.rotate(imageData, 4, 5, rotationDegr);
+        double[][] imageData = predictor.load(new File("src/main/resources/mnist-nums/8_005839.png"));
+        double[][] rotatedImageData = AffineTransformations.strictRotate(imageData, axis1, axis2, rotationDegr);
 
         MatrixUtils.printMatrix(imageData);
         System.out.println();
         MatrixUtils.printMatrix(rotatedImageData);
 
-        System.out.println("Before rotation");
         System.out.println();
+        System.out.println("Before weight rotation");
+        System.out.println();
+        System.out.println("Orig image");
         System.out.println(predictor.predictDetailed(imageData));
         System.out.println();
+        System.out.println("Rotated image");
         System.out.println(predictor.predictDetailed(rotatedImageData));
 
         int layerIndex = 0;
         double[][] origLayerWeights = weightsManager.getLayerWeights(layerIndex);
         double[][] rotatedWeights;
-        rotatedWeights = AffineTransformations.rotate(origLayerWeights, 15, 16, rotationDegr);
+        rotatedWeights = AffineTransformations.strictRotate(origLayerWeights, axis1, axis2, rotationDegr);
         weightsManager.setLayerWeights(layerIndex, rotatedWeights);
 
         // double[][][] origLayerWeights = weightsManager.getAllWeights();
         // double[][] rotatedWeights;
         // for (int i = 0; i < origLayerWeights.length; i++) {
-        //     rotatedWeights = AffineTransformations.rotate(origLayerWeights[i], 4, 5, rotationDegr);
+        //     rotatedWeights = AffineTransformations.strictRotate(origLayerWeights[i], axis1, axis2, rotationDegr);
         //     weightsManager.setLayerWeights(i, rotatedWeights);
         // }
 
-        System.out.println("After rotation on " + rotationDegr);
+        System.out.println("After weight rotation on " + rotationDegr);
         System.out.println();
+        System.out.println("Orig image");
         System.out.println(predictor.predictDetailed(imageData));
         System.out.println();
+        System.out.println("Rotated image");
         System.out.println(predictor.predictDetailed(rotatedImageData));
+
     }
 }
