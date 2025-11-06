@@ -6,4 +6,5 @@ import java.io.IOException;
 public interface ModelImagePredictorExtended extends ModelImagePredictor {
     PredictionResult predictDetailed(double[][] imageData);
     PredictionResult predictDetailedFromImage(File imageFile) throws IOException;
+    double[][] load(File imageFile) throws IOException;
 }

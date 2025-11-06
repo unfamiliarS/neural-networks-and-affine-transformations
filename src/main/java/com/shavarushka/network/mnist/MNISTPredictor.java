@@ -46,12 +46,12 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
     }
 
     public int predictFromImage(File imageFile) throws IOException {
-        double[][] imageData = loadAndPreprocessImage(imageFile);
+        double[][] imageData = load(imageFile);
         return predictDigit(imageData);
     }
 
     public PredictionResult predictDetailedFromImage(File imageFile) throws IOException {
-        double[][] imageData = loadAndPreprocessImage(imageFile);
+        double[][] imageData = load(imageFile);
         return predictDetailed(imageData);
     }
 
@@ -67,37 +67,20 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
         return result;
     }
 
-    private double[][] loadAndPreprocessImage(File imageFile) throws IOException {
+    public double[][] load(File imageFile) throws IOException {
         BufferedImage image = ImageIO.read(imageFile);
-
-        BufferedImage processedImage = preprocessImage(image);
 
         double[][] imageData = new double[28][28];
 
         for (int y = 0; y < 28; y++) {
             for (int x = 0; x < 28; x++) {
-                int rgb = processedImage.getRGB(x, y);
+                int rgb = image.getRGB(x, y);
                 int gray = (rgb >> 16) & 0xFF;
                 imageData[y][x] = gray;
             }
         }
 
         return imageData;
-    }
-
-    private BufferedImage preprocessImage(BufferedImage image) {
-        if (image.getWidth() == 28 && image.getHeight() == 28 &&
-            image.getType() == BufferedImage.TYPE_BYTE_GRAY) {
-            return image;
-        }
-
-        BufferedImage processed = new BufferedImage(28, 28, BufferedImage.TYPE_BYTE_GRAY);
-        java.awt.Graphics2D g = processed.createGraphics();
-
-        g.drawImage(image, 0, 0, 28, 28, null);
-        g.dispose();
-
-        return processed;
     }
 
     private int argMax(double[] array) {

@@ -301,6 +301,10 @@ public class TriangleClassifier {
         }
     }
 
+    public MultiLayerNetwork getModel() {
+        return model;
+    }
+
     public static void main(String[] args) throws IOException {
         TriangleClassifier classifier = TriangleClassifier.load("src/main/resources/triangle-classifier.zip");
 
