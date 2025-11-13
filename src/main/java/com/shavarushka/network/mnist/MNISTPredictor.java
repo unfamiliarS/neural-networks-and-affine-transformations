@@ -4,7 +4,7 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-import com.shavarushka.network.api.ModelImagePredictorExtended;
+import com.shavarushka.network.api.ModelImagePredictor;
 import com.shavarushka.network.api.PredictionResult;
 
 import javax.imageio.ImageIO;
@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class MNISTPredictor implements ModelImagePredictorExtended {
+public class MNISTPredictor implements ModelImagePredictor {
 
     private MultiLayerNetwork model;
 
@@ -20,7 +20,26 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
         this.model = model;
     }
 
-    public double[] predict(double[][] imageData) {
+    public PredictionResult predict(Object imageData) {
+        double[] probabilities = predictProbabilities((double[][]) imageData);
+        int predictedDigit = argMax(probabilities);
+        double confidence = probabilities[predictedDigit];
+
+        return new MNISTPredictionResult(predictedDigit, confidence, probabilities);
+    }
+
+    public PredictionResult predictFromImage(File imageFile) {
+        double[][] imageData;
+        try {
+            imageData = load(imageFile);
+            return predict((double[][]) imageData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private double[] predictProbabilities(double[][] imageData) {
         if (imageData.length != 28 || imageData[0].length != 28) {
             throw new IllegalArgumentException("Image must be 28x28 pixels");
         }
@@ -30,29 +49,6 @@ public class MNISTPredictor implements ModelImagePredictorExtended {
         INDArray output = model.output(input);
 
         return output.toDoubleVector();
-    }
-
-    public int predictDigit(double[][] imageData) {
-        double[] probabilities = predict(imageData);
-        return argMax(probabilities);
-    }
-
-    public PredictionResult predictDetailed(double[][] imageData) {
-        double[] probabilities = predict(imageData);
-        int predictedDigit = argMax(probabilities);
-        double confidence = probabilities[predictedDigit];
-
-        return new PredictionResult(predictedDigit, confidence, probabilities);
-    }
-
-    public int predictFromImage(File imageFile) throws IOException {
-        double[][] imageData = load(imageFile);
-        return predictDigit(imageData);
-    }
-
-    public PredictionResult predictDetailedFromImage(File imageFile) throws IOException {
-        double[][] imageData = load(imageFile);
-        return predictDetailed(imageData);
     }
 
     private double[] flattenAndNormalize(double[][] imageData) {

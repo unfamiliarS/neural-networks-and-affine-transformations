@@ -1,23 +1,21 @@
-package com.shavarushka;
+package com.shavarushka.network.mnist;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-
 import com.shavarushka.affine.AffineTransformations;
 import com.shavarushka.affine.MatrixUtils;
-import com.shavarushka.network.api.ModelImagePredictorExtended;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.WeightsManager;
-import com.shavarushka.network.mnist.MNISTPredictor;
+import com.shavarushka.network.api.fabric.MNISTModelFabric;
+import com.shavarushka.network.api.fabric.ModelFabric;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        MultiLayerNetwork network = ModelLoader.load("src/main/resources/mnist-model.zip");
+        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/mnist-model.zip"));
 
-        WeightsManager weightsManager = new WeightsManager(network);
-        ModelImagePredictorExtended predictor = new MNISTPredictor(network);
+        WeightsManager weightsManager = fabric.createWeightsManager();
+        MNISTPredictor predictor = (MNISTPredictor) fabric.createPredictor();
 
         double rotationDegr = 180;
         int axis1 = 3, axis2 = 10;
@@ -33,10 +31,10 @@ public class Main {
         System.out.println("Before weight rotation");
         System.out.println();
         System.out.println("Orig image");
-        System.out.println(predictor.predictDetailed(imageData));
+        System.out.println(predictor.predict(imageData));
         System.out.println();
         System.out.println("Rotated image");
-        System.out.println(predictor.predictDetailed(rotatedImageData));
+        System.out.println(predictor.predict(rotatedImageData));
 
         int layerIndex = 0;
         double[][] origLayerWeights = weightsManager.getLayerWeights(layerIndex);
@@ -54,10 +52,10 @@ public class Main {
         System.out.println("After weight rotation on " + rotationDegr);
         System.out.println();
         System.out.println("Orig image");
-        System.out.println(predictor.predictDetailed(imageData));
+        System.out.println(predictor.predict(imageData));
         System.out.println();
         System.out.println("Rotated image");
-        System.out.println(predictor.predictDetailed(rotatedImageData));
+        System.out.println(predictor.predict(rotatedImageData));
 
     }
 }

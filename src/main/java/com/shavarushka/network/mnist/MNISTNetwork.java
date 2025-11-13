@@ -49,7 +49,6 @@ public class MNISTNetwork {
                         .build())
                 .build();
 
-        MultiLayerNetwork model = new MultiLayerNetwork(config);
-        return model;
+        return new MultiLayerNetwork(config);
     }
 }

@@ -3,13 +3,15 @@ package com.shavarushka.network.api;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.evaluation.classification.Evaluation;
 
-public abstract class ModelEvaluator implements Evaluator {
+public abstract class ModelEvaluator {
 
     protected MultiLayerNetwork model;
 
     public ModelEvaluator(MultiLayerNetwork model) {
         this.model = model;
     }
+
+    public abstract Evaluation evaluate();
 
     public void printEvaluation() {
         Evaluation evaluation = evaluate();

@@ -16,7 +16,7 @@ public class IteratorDataTrainer extends ModelTrainer {
     public void train(int numEpochs) {
         DataSetIterator trainIterator = dataIterators.getTrainIterator();
 
-        System.out.println("Starting MNIST training...");
+        System.out.println("Starting training...");
         System.out.println("Batch size: " + dataIterators.getBatchSize());
         System.out.println("Number of epochs: " + numEpochs);
 
