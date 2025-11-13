@@ -16,6 +16,8 @@ public class Main {
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
+        weightsManager.printWeights();
+        System.out.println();
 
         double rotationDegr = 180;
 

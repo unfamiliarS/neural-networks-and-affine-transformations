@@ -18,7 +18,7 @@ public class Main {
         MNISTPredictor predictor = (MNISTPredictor) fabric.createPredictor();
 
         double rotationDegr = 180;
-        int axis1 = 3, axis2 = 10;
+        int axis1 = 10, axis2 = 11;
 
         double[][] imageData = predictor.load(new File("src/main/resources/mnist-nums/8_005839.png"));
         double[][] rotatedImageData = AffineTransformations.strictRotate(imageData, axis1, axis2, rotationDegr);
@@ -56,6 +56,5 @@ public class Main {
         System.out.println();
         System.out.println("Rotated image");
         System.out.println(predictor.predict(rotatedImageData));
-
     }
 }

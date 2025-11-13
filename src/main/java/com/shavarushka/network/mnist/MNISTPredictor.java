@@ -79,6 +79,19 @@ public class MNISTPredictor implements ModelImagePredictor {
         return imageData;
     }
 
+    public double[][] flattenImage(double[][] image) {
+        int height = image.length;
+        int width = image[0].length;
+        double[][] flattened = new double[1][height * width];
+        
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                flattened[0][i * width + j] = image[i][j];
+            }
+        }
+        
+        return flattened;
+    }
     private int argMax(double[] array) {
         int maxIndex = 0;
         double maxValue = array[0];
