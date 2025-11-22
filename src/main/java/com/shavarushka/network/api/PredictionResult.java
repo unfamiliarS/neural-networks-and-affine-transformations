@@ -31,7 +31,7 @@ public class PredictionResult {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(String.format("Confidence: %.4f%n", confidence));
+        sb.append("Confidence: " + confidence);
 
         return sb.toString();
     }

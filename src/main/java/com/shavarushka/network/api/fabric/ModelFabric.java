@@ -11,6 +11,10 @@ public abstract class ModelFabric {
 
     protected MultiLayerNetwork network;
 
+    public MultiLayerNetwork getNetwork() {
+        return network;
+    }
+
     protected ModelFabric(MultiLayerNetwork net) {
         network = net;
     }

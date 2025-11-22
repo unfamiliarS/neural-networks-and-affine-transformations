@@ -16,12 +16,11 @@ public class WeightsManager {
 
     public double[][] getLayerWeights(int layerIndex) {
         INDArray weights = model.getLayer(layerIndex).getParam("W");
-        double[][] weightsArray = new double[weights.rows()][weights.columns()];
-        for (int i = 0; i < weights.rows(); i++) {
-            for (int j = 0; j < weights.columns(); j++) {
-                weightsArray[i][j] = weights.getDouble(i, j);
-            }
-        }
+        double[][] weightsArray = new double[weights.columns()][weights.rows()];
+        for (int i = 0; i < weights.columns(); i++)
+            for (int j = 0; j < weights.rows(); j++)
+                weightsArray[i][j] = weights.getDouble(j, i);
+        
         return weightsArray;
     }
 
@@ -36,7 +35,13 @@ public class WeightsManager {
 
     public void setLayerWeights(int layerIndex, double[][] newWeights) {
         INDArray weights = model.getLayer(layerIndex).getParam("W");
-        INDArray newWeightsArray = Nd4j.create(newWeights).reshape(weights.shape());
+
+        double[][] returnedWeights = new double[weights.rows()][weights.columns()];
+        for (int i = 0; i < weights.rows(); i++)
+            for (int j = 0; j < weights.columns(); j++)
+                returnedWeights[i][j] = newWeights[j][i];
+
+        INDArray newWeightsArray = Nd4j.create(returnedWeights);
         model.getLayer(layerIndex).setParam("W", newWeightsArray);
     }
 

@@ -16,10 +16,9 @@ public class TrianglePredictor implements ModelPredictor {
     }
 
     @Override
-    public PredictionResult predict(Object input) {
-        double[] coordinates = (double[]) input;
-        double x = coordinates[0];
-        double y = coordinates[1];
+    public PredictionResult predict(double[] input) {
+        double x = input[0];
+        double y = input[1];
         
         INDArray ndInput = Nd4j.create(new double[][]{{x, y}});
         INDArray output = model.output(ndInput);

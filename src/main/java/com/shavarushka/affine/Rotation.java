@@ -1,8 +1,10 @@
 package com.shavarushka.affine;
 
-public class Rotation {
+import org.ejml.simple.SimpleMatrix;
 
-    public static double[][] strictRotate(double[][] matrix, int axis1, int axis2, double angleDegrees) {
+class Rotation {
+
+    static double[][] rotate(double[][] matrix, int axis1, int axis2, double angleDegrees) {
         if (matrix == null || matrix.length == 0)
             return new double[0][0];
 
@@ -12,42 +14,45 @@ public class Rotation {
         return rotatedMatrix;
     }
 
-    public static double[][] rotate(double[][] weightMatrix, int axis1, int axis2, double angleDegrees) {
-        if (weightMatrix == null || weightMatrix.length == 0)
+    static double[][] rotateAroundAllAxis(double[][] matrix, double angleDegrees) {
+        if (matrix == null || matrix.length == 0)
             return new double[0][0];
 
-        double[][] hyperplanes = extractHyperplanes(weightMatrix);
-
         double angleRadians = Math.toRadians(angleDegrees);
-        double[][] rotatedHyperplanes = applyRotation(hyperplanes, axis1, axis2, angleRadians);
+        double[][] rotatedMatrix = applyRotationAroundAllAxis(matrix, angleRadians);
 
-        return hyperplanesToMatrix(rotatedHyperplanes);
+        return rotatedMatrix;
     }
 
-    private static double[][] extractHyperplanes(double[][] weightMatrix) {
-        int numRows = weightMatrix.length;
-        int numCols = weightMatrix[0].length;
+    private static double[][] applyRotationAroundAllAxis(double[][] coordinates, double angle) {
+        int n = coordinates[0].length;
+        int points = coordinates.length;
 
-        double[][] hyperplanes = new double[numCols][numRows];
+        double[][] rotationMatrix = createComplexRotationMatrix(n, angle);
 
-        for (int i = 0; i < numRows; i++)
-            for (int j = 0; j < numCols; j++)
-                hyperplanes[j][i] = weightMatrix[i][j];
+        double[][] rotated = new double[points][n];
 
-        return hyperplanes;
+        for (int p = 0; p < points; p++)
+            rotated[p] = multiplyMatrixVector(rotationMatrix, coordinates[p]);
+
+        return rotated;
     }
 
-    private static double[][] hyperplanesToMatrix(double[][] hyperplanes) {
-        int numPlanes = hyperplanes.length;
-        int numCoords = hyperplanes[0].length;
+    private static double[][] createComplexRotationMatrix(int dimensions, double angle) {
+        double[][][] rotationMatrices = new double[dimensions-1][dimensions][dimensions];
+        
+        for (int i = 0; i < dimensions-1; i++) {
+            // System.out.println("Create rotation matrix around axis: " + i + " " + i+1);
+            rotationMatrices[i] = createRotationMatrix(dimensions, i, i+1, angle);
+        }
+        
+        double[][] result = rotationMatrices[0];
+        for (int i = 1; i < dimensions - 1; i++) {
+            // System.out.println("Multiply rotation matrixes: " + i);
+            result = multiplyMatrices(result, rotationMatrices[i]);
+        }
 
-        double[][] weightMatrix = new double[numCoords][numPlanes];
-
-        for (int i = 0; i < numCoords; i++)
-            for (int j = 0; j < numPlanes; j++)
-                weightMatrix[i][j] = hyperplanes[j][i];
-
-        return weightMatrix;
+        return result;
     }
 
     private static double[][] applyRotation(double[][] coordinates, int axis1, int axis2, double angle) {
@@ -84,6 +89,29 @@ public class Rotation {
 
         return matrix;
     }
+
+    private static double[][] multiplyMatrices(double[][] a, double[][] b) {
+        SimpleMatrix matrixA = new SimpleMatrix(a);
+        SimpleMatrix matrixB = new SimpleMatrix(b);
+        return matrixA.mult(matrixB).toArray2();
+    }
+
+    // private static double[][] multiplyMatrices(double[][] a, double[][] b) {
+    //     int n = a.length;
+    //     double[][] result = new double[n][n];
+        
+    //     for (int i = 0; i < n; i++) {
+    //         for (int j = 0; j < n; j++) {
+    //             double sum = 0.0;
+    //             for (int k = 0; k < n; k++) {
+    //                 sum += a[i][k] * b[k][j];
+    //             }
+    //             result[i][j] = sum;
+    //         }
+    //     }
+        
+    //     return result;
+    // }
 
     private static double[] multiplyMatrixVector(double[][] matrix, double[] vector) {
         int n = vector.length;

@@ -16,13 +16,26 @@ public class Main {
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
+        System.out.println();
         weightsManager.printWeights();
         System.out.println();
 
         double rotationDegr = 180;
 
         double[][] dataset = DataGenerator.getFromCSV("src/main/python/triangle/dataset.csv");
-        double[][] rotatedDataSet = AffineTransformations.strictRotate(dataset, 0, 1, rotationDegr);
+        double[][] rotatedDataSet = AffineTransformations.rotate(dataset, 0, 1, rotationDegr);
+        int dataSetSampleIndex = 6;
+        double[] dataSetSample = dataset[dataSetSampleIndex];
+        double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
+
+        System.out.println("Before weight rotation");
+        System.out.println();
+        System.out.println(predictor.predict(dataSetSample));
+
+        System.out.println();
+        System.out.println(predictor.predict(rotatedDataSetSample));
+
+        System.out.println();
 
         for (int i = 0; i < 20; i++)
             System.out.println(Arrays.toString(dataset[i]));
@@ -31,15 +44,15 @@ public class Main {
 
         for (int i = 0; i < 20; i++)
             System.out.println(Arrays.toString(rotatedDataSet[i]));
-            
-        System.out.println();
-
-        double[] rotatedDataSetSample = rotatedDataSet[4];
-        System.out.println(predictor.predict(rotatedDataSetSample));
 
         double[][][] allWeights = weightsManager.getAllWeights();
-        double[][] rotatedWeights = AffineTransformations.strictRotate(allWeights[0], 0, 1, rotationDegr);
+        double[][] rotatedWeights = AffineTransformations.rotate(allWeights[0], 0, 1, rotationDegr);
         weightsManager.setLayerWeights(0, rotatedWeights);
+
+        System.out.println();
+        System.out.println("After weight rotation on " + rotationDegr);
+        System.out.println();
+        System.out.println(predictor.predict(dataSetSample));
 
         System.out.println();
         System.out.println(predictor.predict(rotatedDataSetSample));
