@@ -12,13 +12,12 @@ import com.shavarushka.network.api.fabric.ModelFabric;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("simple-mnist.zip"));
+        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/simple-mnist.zip"));
 
         WeightsManager weightsManager = fabric.createWeightsManager();
         MNISTPredictor predictor = (MNISTPredictor) fabric.createPredictor();
 
         double rotationDegr = 256;
-        int axis1 = 180, axis2 = 181;
 
         double[][] imageData = ImageHandler.load(new File("src/main/resources/mnist-nums/2_000587.png"));
         double[][] flattenImageData = new double[][]{ImageHandler.flattenImage(imageData)};

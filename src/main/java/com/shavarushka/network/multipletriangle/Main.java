@@ -1,4 +1,4 @@
-package com.shavarushka.network.triangle;
+package com.shavarushka.network.multipletriangle;
 
 import java.util.Arrays;
 
@@ -7,23 +7,25 @@ import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.ModelFabric;
-import com.shavarushka.network.api.fabric.TriangleModelFabric;
+import com.shavarushka.network.api.fabric.MultipleTriangleModelFabric;
 
 public class Main {
     public static void main(String[] args) {
-        ModelFabric fabric = new TriangleModelFabric(ModelLoader.load("src/main/resources/triangle-classifier.zip"));
+        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/multiple-triangle.zip"));
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
+
         System.out.println();
         weightsManager.printWeights();
         System.out.println();
 
-        double rotationDegr = 180;
+        double rotationDegr = 256;
 
-        double[][] dataset = TriangleDataGenerator.getFromCSV("src/main/python/triangle/dataset.csv");
-        double[][] rotatedDataSet = AffineTransformations.rotate(dataset, 0, 1, rotationDegr);
-        int dataSetSampleIndex = 6;
+        double[][] dataset = MultipleTriangleDataGenerator.getFromCSV("src/main/python/multipletriangle/dataset.csv");
+        double[][] rotatedDataSet = AffineTransformations.rotateComplex(dataset, rotationDegr);
+        int dataSetSampleIndex = 3;
+        System.out.println("Data sample: " + Arrays.toString(dataset[dataSetSampleIndex]) + "\n");
         double[] dataSetSample = dataset[dataSetSampleIndex];
         double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
 
@@ -45,7 +47,7 @@ public class Main {
             System.out.println(Arrays.toString(rotatedDataSet[i]));
 
         double[][][] allWeights = weightsManager.getAllWeights();
-        double[][] rotatedWeights = AffineTransformations.rotate(allWeights[0], 0, 1, rotationDegr);
+        double[][] rotatedWeights = AffineTransformations.rotateComplex(allWeights[0], rotationDegr);
         weightsManager.setLayerWeights(0, rotatedWeights);
 
         System.out.println();
