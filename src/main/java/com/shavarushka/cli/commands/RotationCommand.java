@@ -70,6 +70,6 @@ public class RotationCommand implements Command {
         System.out.println(predictor.predict(data[0]));
         System.out.println();
         System.out.println("Rotated data");
-        System.out.println(predictor.predict(rotatedData[0])); 
+        System.out.println(predictor.predict(rotatedData[0]));
     }
 }

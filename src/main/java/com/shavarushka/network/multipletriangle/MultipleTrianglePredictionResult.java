@@ -7,7 +7,7 @@ public class MultipleTrianglePredictionResult extends PredictionResult {
     private final double[] classProbabilities;
     private final String className;
 
-    public MultipleTrianglePredictionResult(int predictedClass, double confidence, 
+    public MultipleTrianglePredictionResult(int predictedClass, double confidence,
                                           double[] classProbabilities, String className) {
         super(confidence);
         this.predictedClass = predictedClass;
@@ -42,13 +42,13 @@ public class MultipleTrianglePredictionResult extends PredictionResult {
           .append(" (Class ").append(predictedClass).append(")")
           .append("\nConfidence: ").append(String.format("%.4f", getConfidence()))
           .append("\nAll probabilities: ");
-        
+
         for (int i = 0; i < classProbabilities.length; i++) {
             String classDesc = (i == 0) ? "Outside" : "Triangle " + i;
             sb.append("\n  ").append(classDesc).append(": ")
               .append(String.format("%f", classProbabilities[i]));
         }
-        
+
         return sb.toString();
     }
 }

@@ -19,28 +19,28 @@ public class MultipleTrianglePredictor implements ModelPredictor {
     public PredictionResult predict(double[] input) {
         double x = input[0];
         double y = input[1];
-        
+
         INDArray ndInput = Nd4j.create(new double[][]{{x, y}});
         INDArray output = model.output(ndInput);
-        
+
         double[] probabilities = output.toDoubleVector();
-        
+
         int predictedClass = -1;
         double maxProbability = -1.0;
-        
+
         for (int i = 0; i < probabilities.length; i++) {
             if (probabilities[i] > maxProbability) {
                 maxProbability = probabilities[i];
                 predictedClass = i;
             }
         }
-        
+
         String className = getClassName(predictedClass);
-        
+
         return new MultipleTrianglePredictionResult(
-            predictedClass, 
-            maxProbability, 
-            probabilities, 
+            predictedClass,
+            maxProbability,
+            probabilities,
             className
         );
     }

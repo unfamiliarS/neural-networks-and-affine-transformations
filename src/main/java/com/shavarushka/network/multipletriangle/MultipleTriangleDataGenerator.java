@@ -39,7 +39,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         int totalClasses = numTriangles + 1;
         int samplesPerClass = numSamples / totalClasses;
         int[] counts = new int[totalClasses];
-        
+
         // Убедимся, что общее количество samples не превышает numSamples
         int actualTotalSamples = samplesPerClass * totalClasses;
         if (actualTotalSamples > numSamples) {
@@ -70,7 +70,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
                 counts[classIndex]++;
                 totalCount++;
             }
-            
+
             // Защита от бесконечного цикла
             if (totalCount > numSamples) {
                 break;
@@ -81,7 +81,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         while (totalCount < numSamples) {
             double x = random.nextDouble() * 10.0;
             double y = random.nextDouble() * 10.0;
-            
+
             // Определяем класс для случайной точки
             int triangleIndex = -1;
             for (int i = 0; i < numTriangles; i++) {
@@ -91,7 +91,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
                 }
             }
             int classIndex = triangleIndex + 1;
-            
+
             addSample(features, labels, totalCount, x, y, classIndex, totalClasses);
             totalCount++;
         }
@@ -134,10 +134,10 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         if (index >= features.rows()) {
             throw new IllegalArgumentException("Index " + index + " is out of bounds for array with " + features.rows() + " rows");
         }
-        
+
         features.putScalar(new int[]{index, 0}, x);
         features.putScalar(new int[]{index, 1}, y);
-        
+
         // One-hot encoding
         for (int i = 0; i < numClasses; i++) {
             labels.putScalar(new int[]{index, i}, i == classIndex ? 1.0 : 0.0);
@@ -185,7 +185,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
             for (int i = 0; i < features.rows(); i++) {
                 double x = features.getDouble(i, 0);
                 double y = features.getDouble(i, 1);
-                
+
                 int classIndex = -1;
                 double maxProb = -1.0;
                 for (int j = 0; j < labels.columns(); j++) {
@@ -195,7 +195,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
                         classIndex = j;
                     }
                 }
-                
+
                 String className = getClassName(classIndex, numTriangles);
 
                 writer.printf("%.6f,%.6f,%d,%s%n", x, y, classIndex, className);
@@ -223,19 +223,19 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             boolean isFirstLine = true;
-            
+
             while ((line = reader.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
                     continue;
                 }
-                
+
                 String[] parts = line.split(",");
                 if (parts.length >= 2) {
                     // Формат: x,y,class,class_name - берем только x и y
                     double x = Double.parseDouble(parts[0].trim());
                     double y = Double.parseDouble(parts[1].trim());
-                    
+
                     pointsList.add(new double[]{x, y});
                 }
             }
@@ -243,13 +243,13 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
-        
+
         // Конвертируем List в double[][]
         double[][] pointsArray = new double[pointsList.size()][2];
         for (int i = 0; i < pointsList.size(); i++) {
             pointsArray[i] = pointsList.get(i);
         }
-        
+
         return pointsArray;
     }
 }

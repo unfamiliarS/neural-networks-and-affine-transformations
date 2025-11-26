@@ -19,11 +19,11 @@ public class TrianglePredictor implements ModelPredictor {
     public PredictionResult predict(double[] input) {
         double x = input[0];
         double y = input[1];
-        
+
         INDArray ndInput = Nd4j.create(new double[][]{{x, y}});
         INDArray output = model.output(ndInput);
         double confidence = output.getDouble(0);
-        
+
         return new PredictionResult(confidence);
     }
 }

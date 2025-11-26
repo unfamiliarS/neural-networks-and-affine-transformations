@@ -125,22 +125,22 @@ public class TriangleDataGenerator implements DataGenerator {
 
     public static double[][] getFromCSV(String filename) {
         List<double[]> pointsList = new ArrayList<>();
-        
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             boolean isFirstLine = true;
-            
+
             while ((line = reader.readLine()) != null) {
                 if (isFirstLine) {
                     isFirstLine = false;
                     continue;
                 }
-                
+
                 String[] parts = line.split(",");
                 if (parts.length >= 2) {
                     double x = Double.parseDouble(parts[0].trim());
                     double y = Double.parseDouble(parts[1].trim());
-                    
+
                     pointsList.add(new double[]{x, y});
                 }
             }
@@ -148,12 +148,12 @@ public class TriangleDataGenerator implements DataGenerator {
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
-        
+
         double[][] pointsArray = new double[pointsList.size()][2];
         for (int i = 0; i < pointsList.size(); i++) {
             pointsArray[i] = pointsList.get(i);
         }
-        
+
         return pointsArray;
     }
 }

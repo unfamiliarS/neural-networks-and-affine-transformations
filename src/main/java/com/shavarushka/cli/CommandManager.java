@@ -20,7 +20,7 @@ public class CommandManager {
         parsedCommands = cmd;
         requiredArgs = new RequiredArgsParser().parse();
 
-        register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));      
+        register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));
     }
 
     private void register(Command command) {
@@ -30,7 +30,7 @@ public class CommandManager {
     public void process() {
         for (Map.Entry<String, Command> entry : commands.entrySet())
             if (commandShouldExecute(entry))
-                entry.getValue().execute();     
+                entry.getValue().execute();
     }
 
     private boolean commandShouldExecute(Entry<String,Command> entry) {

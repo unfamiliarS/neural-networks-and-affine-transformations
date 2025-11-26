@@ -15,8 +15,8 @@ public class ModelFactoryOfFactory {
                                     case "triangle" -> new TriangleModelFabric(net);
                                     case "multipletriangle" -> new MultipleTriangleModelFabric(net);
                                     default -> throw new IllegalArgumentException(
-                                        String.format("Unknown model type: '%s'. Supported types: %s", 
-                                            fabricType, 
+                                        String.format("Unknown model type: '%s'. Supported types: %s",
+                                            fabricType,
                                             "mnist, triangle, multipletriangle")
                                     );
                     };
@@ -24,6 +24,6 @@ public class ModelFactoryOfFactory {
             }
         }
 
-        return instance;   
+        return instance;
     }
 }

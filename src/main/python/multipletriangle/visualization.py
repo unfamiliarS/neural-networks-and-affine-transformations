@@ -16,8 +16,8 @@ for class_id in df['class'].unique():
     class_data = df[df['class'] == class_id]
     color = colors.get(class_id, 'gray')
     label = class_data['class_name'].iloc[0] if 'class_name' in class_data.columns else f'Class {class_id}'
-    
-    plt.scatter(class_data['x'], class_data['y'], 
+
+    plt.scatter(class_data['x'], class_data['y'],
                 c=color, alpha=0.7, s=40,
                 edgecolors='black', linewidth=0.3,
                 label=label)

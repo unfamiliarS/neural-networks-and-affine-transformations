@@ -16,7 +16,7 @@ public class PointDataOptionValidator extends BaseOptionValidator {
     public void validate() throws OptionValidationException {
         if (!dataIsPoint())
             throw new OptionValidationException("Invalid data value");
-        
+
         validateNext();
     }
 

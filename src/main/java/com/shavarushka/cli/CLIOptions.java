@@ -4,7 +4,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 public interface CLIOptions {
-    
+
     static Options OPTIONS = createOptions();
 
     private static Options createOptions() {

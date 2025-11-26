@@ -5,7 +5,7 @@ import java.io.File;
 import com.shavarushka.cli.validators.exceptions.OptionValidationException;
 
 public class FileValidator implements OptionValidator {
-    
+
     private String filePath;
 
     public FileValidator(String file) {

@@ -40,15 +40,13 @@ class Rotation {
 
     private static double[][] createComplexRotationMatrix(int dimensions, double angle) {
         double[][][] rotationMatrices = new double[dimensions-1][dimensions][dimensions];
-        
+
         for (int i = 0; i < dimensions-1; i++) {
-            // System.out.println("Create rotation matrix around axis: " + i + " " + i+1);
             rotationMatrices[i] = createRotationMatrix(dimensions, i, i+1, angle);
         }
-        
+
         double[][] result = rotationMatrices[0];
         for (int i = 1; i < dimensions - 1; i++) {
-            // System.out.println("Multiply rotation matrixes: " + i);
             result = multiplyMatrices(result, rotationMatrices[i]);
         }
 
@@ -96,23 +94,6 @@ class Rotation {
         return matrixA.mult(matrixB).toArray2();
     }
 
-    // private static double[][] multiplyMatrices(double[][] a, double[][] b) {
-    //     int n = a.length;
-    //     double[][] result = new double[n][n];
-        
-    //     for (int i = 0; i < n; i++) {
-    //         for (int j = 0; j < n; j++) {
-    //             double sum = 0.0;
-    //             for (int k = 0; k < n; k++) {
-    //                 sum += a[i][k] * b[k][j];
-    //             }
-    //             result[i][j] = sum;
-    //         }
-    //     }
-        
-    //     return result;
-    // }
-
     private static double[] multiplyMatrixVector(double[][] matrix, double[] vector) {
         int n = vector.length;
         double[] result = new double[n];
@@ -121,7 +102,7 @@ class Rotation {
             double sum = 0.0;
             for (int j = 0; j < n; j++)
                 sum += matrix[i][j] * vector[j];
-   
+
             result[i] = sum;
         }
 

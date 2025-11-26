@@ -20,7 +20,7 @@ public class WeightsManager {
         for (int i = 0; i < weights.columns(); i++)
             for (int j = 0; j < weights.rows(); j++)
                 weightsArray[i][j] = weights.getDouble(j, i);
-        
+
         return weightsArray;
     }
 

@@ -21,7 +21,7 @@ public class ModelTypeOptionValidator extends BaseOptionValidator {
         String model = args.getOptionValue("mtype");
         if (!SUPPORTED_MODELS.contains(model.toLowerCase())) {
             throw new OptionValidationException(
-                String.format("Unknown model type: '%s'. Supported types: %s", 
+                String.format("Unknown model type: '%s'. Supported types: %s",
                     model, SUPPORTED_MODELS));
         }
 

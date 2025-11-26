@@ -20,7 +20,7 @@ public class RotateOptionValidator extends BaseOptionValidator {
                 if (angle < -360 || angle > 360)
                     throw new OptionValidationException("Rotation angle must be between -360 and 360 degrees");
             } catch (NumberFormatException e) {
-                throw new OptionValidationException("Invalid rotation angle: " + rotateValue + 
+                throw new OptionValidationException("Invalid rotation angle: " + rotateValue +
                     ". Must be a numeric value");
             }
         }
