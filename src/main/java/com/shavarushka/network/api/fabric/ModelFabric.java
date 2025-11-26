@@ -23,17 +23,4 @@ public abstract class ModelFabric {
     public WeightsManager createWeightsManager() {
         return new WeightsManager(network);
     }
-
-    public static ModelFabric createFabric(String fabricType, MultiLayerNetwork net) {
-        return switch (fabricType.toLowerCase()) {
-            case "mnist" -> new MNISTModelFabric(net);
-            case "triangle" -> new TriangleModelFabric(net);
-            case "multipletriangle" -> new MultipleTriangleModelFabric(net);
-            default -> throw new IllegalArgumentException(
-                String.format("Unknown model type: '%s'. Supported types: %s", 
-                    fabricType, 
-                    "mnist, triangle, multipletriangle")
-            );
-        };
-    }
 }

@@ -1,6 +1,5 @@
 package com.shavarushka.cli.commands;
 
-import java.io.File;
 import java.util.Map;
 
 import com.shavarushka.affine.AffineTransformations;
@@ -9,19 +8,23 @@ import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.ModelFabric;
-import com.shavarushka.network.mnist.ImageHandler;
+import com.shavarushka.network.api.fabric.ModelFactoryOfFactory;
 
 public class RotationCommand implements Command {
 
-    private double rotationAngle;
-    private Map<String,String> requiredArgs;
+    private DataExtractionStrategy dataExtractor;
     private ModelFabric fabric;
 
+    private double rotationAngle;
+
     public RotationCommand(Map<String,String> requiredArgs, String rotationAngle) {
-        this.requiredArgs = requiredArgs;
         this.rotationAngle = Double.parseDouble(rotationAngle);
 
-        fabric = ModelFabric.createFabric(
+        dataExtractor = requiredArgs.get("mtype").equals("mnist") ?
+                            new ImageDataExtraction(requiredArgs.get("data")) :
+                            new PointDataExtraction(requiredArgs.get("data"));
+
+        fabric = ModelFactoryOfFactory.createFabric(
             requiredArgs.get("mtype"),
             ModelLoader.load(requiredArgs.get("model"))
         );
@@ -37,22 +40,22 @@ public class RotationCommand implements Command {
         WeightsManager weightsManager = fabric.createWeightsManager();
         ModelPredictor predictor = fabric.createPredictor();
 
-        double[][] imageData = ImageHandler.load(new File(requiredArgs.get("data")));
-        double[][] flattenImageData = new double[][]{ImageHandler.flattenImage(imageData)};
-        double[][] rotatedImageData = AffineTransformations.rotateComplex(flattenImageData, rotationAngle);
+        double[][] data = new double[][]{dataExtractor.extract()};
+        double[][] rotatedData = AffineTransformations.rotateComplex(data, rotationAngle);
 
-        MatrixUtils.printMatrix(flattenImageData);
         System.out.println();
-        MatrixUtils.printMatrix(rotatedImageData);
+        MatrixUtils.printMatrix(data);
+        System.out.println();
+        MatrixUtils.printMatrix(rotatedData);
 
         System.out.println();
         System.out.println("Before weight rotation");
         System.out.println();
-        System.out.println("Orig image");
-        System.out.println(predictor.predict(flattenImageData[0]));
+        System.out.println("Orig data");
+        System.out.println(predictor.predict(data[0]));
         System.out.println();
-        System.out.println("Rotated image");
-        System.out.println(predictor.predict(rotatedImageData[0]));
+        System.out.println("Rotated data");
+        System.out.println(predictor.predict(rotatedData[0]));
 
         int layerIndex = 0;
         double[][] origLayerWeights = weightsManager.getLayerWeights(layerIndex);
@@ -60,13 +63,13 @@ public class RotationCommand implements Command {
         rotatedWeights = AffineTransformations.rotateComplex(origLayerWeights, rotationAngle);
         weightsManager.setLayerWeights(layerIndex, rotatedWeights);
 
+        System.out.println();
         System.out.println("After weight rotation on " + rotationAngle);
         System.out.println();
-        System.out.println("Orig image");
-        System.out.println(predictor.predict(flattenImageData[0]));
+        System.out.println("Orig data");
+        System.out.println(predictor.predict(data[0]));
         System.out.println();
-        System.out.println("Rotated image");
-        System.out.println(predictor.predict(rotatedImageData[0])); 
+        System.out.println("Rotated data");
+        System.out.println(predictor.predict(rotatedData[0])); 
     }
-
 }

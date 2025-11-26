@@ -11,7 +11,7 @@ import com.shavarushka.cli.commands.Command;
 import com.shavarushka.cli.commands.RotationCommand;
 
 public class CommandManager {
-    
+
     private Map<String, Command> commands = new HashMap<>();
     private Map<String, String> requiredArgs;
     private CommandLine parsedCommands;
@@ -20,7 +20,7 @@ public class CommandManager {
         parsedCommands = cmd;
         requiredArgs = new RequiredArgsParser().parse();
 
-        register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));
+        register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));      
     }
 
     private void register(Command command) {
