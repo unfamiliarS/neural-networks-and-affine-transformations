@@ -6,6 +6,7 @@ import com.shavarushka.affine.AffineTransformations;
 import com.shavarushka.affine.MatrixUtils;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
+import com.shavarushka.network.api.NeuronActivationHandler;
 import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.ModelFabric;
 import com.shavarushka.network.api.fabric.ModelFactoryOfFactory;
@@ -51,10 +52,16 @@ public class RotationCommand implements Command {
         System.out.println();
         System.out.println("Before weight rotation");
         System.out.println();
-        System.out.println("Orig data");
+        System.out.println("Original data");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), data[0]));
+        System.out.println();
         System.out.println(predictor.predict(data[0]));
         System.out.println();
         System.out.println("Rotated data");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), rotatedData[0]));
+        System.out.println();
         System.out.println(predictor.predict(rotatedData[0]));
 
         int layerIndex = 0;
@@ -66,10 +73,16 @@ public class RotationCommand implements Command {
         System.out.println();
         System.out.println("After weight rotation on " + rotationAngle);
         System.out.println();
-        System.out.println("Orig data");
+        System.out.println("Original data");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), data[0]));
+        System.out.println();
         System.out.println(predictor.predict(data[0]));
         System.out.println();
         System.out.println("Rotated data");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), rotatedData[0]));
+        System.out.println();
         System.out.println(predictor.predict(rotatedData[0]));
     }
 }

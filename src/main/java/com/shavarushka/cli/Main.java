@@ -10,8 +10,8 @@ import com.shavarushka.cli.validators.exceptions.OptionValidationException;
 public class Main {
     public static void main(String[] args) {
         try {
-            // String[] argss = new String[]{"--rotate=256", "--model=src/main/resources/simple-mnist.zip", "--mtype=mnist", "--data=src/main/resources/mnist-nums/2_000587.png"};
-            String[] argss = new String[]{"--rotate=256", "--model=src/main/resources/triangle-classifier.zip", "--mtype=triangle", "--data=2.646525,2.611743"};
+            String[] argss = new String[]{"--rotate=256", "--model=src/main/resources/mnist-model.zip", "--mtype=mnist", "--data=src/main/resources/mnist-nums/8_005839.png"};
+            // String[] argss = new String[]{"--rotate=256", "--model=src/main/resources/triangle-classifier.zip", "--mtype=triangle", "--data=3.365680,1.193819"};
 
             CommandLine parsedArgs = parseEnteredArgs(argss);
 

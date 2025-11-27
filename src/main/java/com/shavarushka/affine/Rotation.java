@@ -26,14 +26,10 @@ class Rotation {
 
     private static double[][] applyRotationAroundAllAxis(double[][] coordinates, double angle) {
         int n = coordinates[0].length;
-        int points = coordinates.length;
 
         double[][] rotationMatrix = createComplexRotationMatrix(n, angle);
 
-        double[][] rotated = new double[points][n];
-
-        for (int p = 0; p < points; p++)
-            rotated[p] = multiplyMatrixVector(rotationMatrix, coordinates[p]);
+        double[][] rotated = multiplyWithTranspose(rotationMatrix, coordinates);
 
         return rotated;
     }
@@ -46,26 +42,21 @@ class Rotation {
         }
 
         double[][] result = rotationMatrices[0];
-        for (int i = 1; i < dimensions - 1; i++) {
+        for (int i = 1; i < dimensions - 1; i++)
             result = multiplyMatrices(result, rotationMatrices[i]);
-        }
 
         return result;
     }
 
     private static double[][] applyRotation(double[][] coordinates, int axis1, int axis2, double angle) {
         int n = coordinates[0].length;
-        int points = coordinates.length;
 
         if (axis1 < 0 || axis1 >= n || axis2 < 0 || axis2 >= n || axis1 == axis2)
             throw new IllegalArgumentException("Invalid rotation axes");
 
         double[][] rotationMatrix = createRotationMatrix(n, axis1, axis2, angle);
 
-        double[][] rotated = new double[points][n];
-
-        for (int p = 0; p < points; p++)
-            rotated[p] = multiplyMatrixVector(rotationMatrix, coordinates[p]);
+        double[][] rotated = multiplyWithTranspose(rotationMatrix, coordinates);
 
         return rotated;
     }
@@ -94,18 +85,12 @@ class Rotation {
         return matrixA.mult(matrixB).toArray2();
     }
 
-    private static double[] multiplyMatrixVector(double[][] matrix, double[] vector) {
-        int n = vector.length;
-        double[] result = new double[n];
+    private static double[][] multiplyWithTranspose(double[][] rotationMatrix, double[][] coordinates) {
+        SimpleMatrix rot = new SimpleMatrix(rotationMatrix);
+        SimpleMatrix coords = new SimpleMatrix(coordinates);
 
-        for (int i = 0; i < n; i++) {
-            double sum = 0.0;
-            for (int j = 0; j < n; j++)
-                sum += matrix[i][j] * vector[j];
-
-            result[i] = sum;
-        }
-
-        return result;
+        SimpleMatrix result = rot.mult(coords.transpose());
+        
+        return result.transpose().toArray2();
     }
 }
