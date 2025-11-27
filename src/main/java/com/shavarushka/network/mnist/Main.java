@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.shavarushka.affine.AffineTransformations;
 import com.shavarushka.affine.MatrixUtils;
 import com.shavarushka.network.api.ModelLoader;
+import com.shavarushka.network.api.NeuronActivationHandler;
 import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.MNISTModelFabric;
 import com.shavarushka.network.api.fabric.ModelFabric;
@@ -19,7 +20,7 @@ public class Main {
 
         double rotationDegr = 256;
 
-        double[][] imageData = ImageHandler.load(new File("src/main/resources/mnist-nums/2_000587.png"));
+        double[][] imageData = ImageHandler.load(new File("src/main/resources/mnist-nums/8_005839.png"));
         double[][] flattenImageData = new double[][]{ImageHandler.flattenImage(imageData)};
         double[][] rotatedImageData = AffineTransformations.rotateComplex(flattenImageData, rotationDegr);
 
@@ -31,9 +32,15 @@ public class Main {
         System.out.println("Before weight rotation");
         System.out.println();
         System.out.println("Orig image");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), flattenImageData[0]));
+        System.out.println();
         System.out.println(predictor.predict(flattenImageData[0]));
         System.out.println();
         System.out.println("Rotated image");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), rotatedImageData[0]));
+        System.out.println();
         System.out.println(predictor.predict(rotatedImageData[0]));
 
         int layerIndex = 0;
@@ -45,9 +52,15 @@ public class Main {
         System.out.println("After weight rotation on " + rotationDegr);
         System.out.println();
         System.out.println("Orig image");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), flattenImageData[0]));
+        System.out.println();
         System.out.println(predictor.predict(flattenImageData[0]));
         System.out.println();
         System.out.println("Rotated image");
+        System.out.println("Neuron activations:");
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), rotatedImageData[0]));
+        System.out.println();
         System.out.println(predictor.predict(rotatedImageData[0]));
     }
 }
