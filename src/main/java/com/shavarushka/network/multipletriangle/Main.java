@@ -11,13 +11,17 @@ import com.shavarushka.network.api.fabric.MultipleTriangleModelFabric;
 
 public class Main {
     public static void main(String[] args) {
-        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/multiple-triangle.zip"));
+        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangles.zip"));
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
 
         System.out.println();
+        System.out.println("Weights:");
         weightsManager.printWeights();
+        System.out.println();
+        System.out.println("Biases:");
+        weightsManager.printBiases();
         System.out.println();
 
         double rotationDegr = 256;

@@ -7,7 +7,8 @@ df['x'] = pd.to_numeric(df['x'], errors='coerce')
 df['y'] = pd.to_numeric(df['y'], errors='coerce')
 df['class'] = pd.to_numeric(df['class'], errors='coerce')
 
-weights_layer0 = [[-3.262287139892578, -2.8782620429992676], [1.9234658479690552, -1.6480084657669067]]
+weights_layer0 = [[-3.262287139892578, -2.8782620429992676],
+                  [1.9234658479690552, -1.6480084657669067]]
 weights_layer1 = [-3.546369791030884, 3.584458589553833]
 biases_layer0 = [0.9883695244789124, 16.352188110351562]
 bias_layer1 = [-5.169458389282227]

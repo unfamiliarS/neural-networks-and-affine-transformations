@@ -19,14 +19,23 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
 
     private long seed;
     private int numSamples;
-    private int numTriangles;
-    private double[][][] trianglesVertices;
 
-    public MultipleTriangleDataGenerator(int numSamples, int numTriangles, boolean isTrain) {
+    private double[][][] trianglesVertices = {
+        {
+            {1.0, 1.0},
+            {5.0, 1.0}, 
+            {3.0, 4.0}
+        },
+        {
+            {5.0, 5.0},
+            {11.0, 5.0},
+            {8.0, 11.0}
+        }
+    };
+
+    public MultipleTriangleDataGenerator(int numSamples, boolean isTrain) {
         this.numSamples = numSamples;
-        this.numTriangles = numTriangles;
         this.seed = isTrain ? 12345 : 54321;
-        this.trianglesVertices = generateTriangles(numTriangles);
     }
 
     @Override
@@ -34,86 +43,39 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         Nd4j.getRandom().setSeed(seed);
 
         INDArray features = Nd4j.create(numSamples, 2);
-        INDArray labels = Nd4j.create(numSamples, numTriangles + 1);
+        INDArray labels = Nd4j.create(numSamples, 1);
 
-        int totalClasses = numTriangles + 1;
-        int samplesPerClass = numSamples / totalClasses;
-        int[] counts = new int[totalClasses];
+        int samplesPerClass = numSamples / 2;
+        int insideCount = 0;
+        int outsideCount = 0;
 
-        // Убедимся, что общее количество samples не превышает numSamples
-        int actualTotalSamples = samplesPerClass * totalClasses;
-        if (actualTotalSamples > numSamples) {
-            samplesPerClass = numSamples / totalClasses;
-            actualTotalSamples = samplesPerClass * totalClasses;
-        }
+        while (insideCount < samplesPerClass || outsideCount < samplesPerClass) {
+            double x = Nd4j.getRandom().nextDouble() * 12.0;
+            double y = Nd4j.getRandom().nextDouble() * 12.0;
 
-        Random random = new Random(seed);
-        int totalCount = 0;
+            boolean inAnyTriangle = isPointInAnyTriangle(x, y);
 
-        while (totalCount < actualTotalSamples) {
-            double x = random.nextDouble() * 10.0;
-            double y = random.nextDouble() * 10.0;
-
-            int triangleIndex = -1;
-            for (int i = 0; i < numTriangles; i++) {
-                if (isPointInTriangle(x, y, trianglesVertices[i])) {
-                    triangleIndex = i;
-                    break;
-                }
-            }
-
-            int classIndex = triangleIndex + 1;
-
-            // Проверяем, нужны ли еще samples для этого класса
-            if (classIndex >= 0 && classIndex < counts.length && counts[classIndex] < samplesPerClass) {
-                addSample(features, labels, totalCount, x, y, classIndex, totalClasses);
-                counts[classIndex]++;
-                totalCount++;
-            }
-
-            // Защита от бесконечного цикла
-            if (totalCount > numSamples) {
-                break;
+            if (inAnyTriangle && insideCount < samplesPerClass) {
+                int index = insideCount + outsideCount;
+                features.putScalar(new int[]{index, 0}, x);
+                features.putScalar(new int[]{index, 1}, y);
+                labels.putScalar(new int[]{index, 0}, 1.0);
+                insideCount++;
+            } else if (!inAnyTriangle && outsideCount < samplesPerClass) {
+                int index = insideCount + outsideCount;
+                features.putScalar(new int[]{index, 0}, x);
+                features.putScalar(new int[]{index, 1}, y);
+                labels.putScalar(new int[]{index, 0}, 0.0);
+                outsideCount++;
             }
         }
 
-        // Если не набрали достаточно samples, заполним оставшиеся случайными точками
-        while (totalCount < numSamples) {
-            double x = random.nextDouble() * 10.0;
-            double y = random.nextDouble() * 10.0;
-
-            // Определяем класс для случайной точки
-            int triangleIndex = -1;
-            for (int i = 0; i < numTriangles; i++) {
-                if (isPointInTriangle(x, y, trianglesVertices[i])) {
-                    triangleIndex = i;
-                    break;
-                }
-            }
-            int classIndex = triangleIndex + 1;
-
-            addSample(features, labels, totalCount, x, y, classIndex, totalClasses);
-            totalCount++;
-        }
-
-        return shuffleDataset(features, labels);
+        return shuffleDataset(new DataSet(features, labels));
     }
 
-    private double[][][] generateTriangles(int numTriangles) {
-        double[][][] triangles = new double[numTriangles][3][2];
-        Random random = new Random(seed);
-
-        for (int i = 0; i < numTriangles; i++) {
-            double centerX = 2.0 + random.nextDouble() * 6.0;
-            double centerY = 2.0 + random.nextDouble() * 6.0;
-            double size = 0.5 + random.nextDouble() * 2.0;
-
-            triangles[i][0] = new double[]{centerX, centerY + size};
-            triangles[i][1] = new double[]{centerX - size, centerY - size};
-            triangles[i][2] = new double[]{centerX + size, centerY - size};
-        }
-
-        return triangles;
+    private boolean isPointInAnyTriangle(double x, double y) {
+        return isPointInTriangle(x, y, trianglesVertices[0]) || 
+               isPointInTriangle(x, y, trianglesVertices[1]);
     }
 
     private boolean isPointInTriangle(double x, double y, double[][] triangle) {
@@ -126,30 +88,14 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         double b = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / denominator;
         double c = 1 - a - b;
 
-        return a >= 0 && b >= 0 && c >= 0;
+        return a >= 0 && a <= 1 && b >= 0 && b <= 1 && c >= 0 && c <= 1;
     }
 
-    private void addSample(INDArray features, INDArray labels, int index, double x, double y, int classIndex, int numClasses) {
-        // Проверяем, что индекс в пределах границ
-        if (index >= features.rows()) {
-            throw new IllegalArgumentException("Index " + index + " is out of bounds for array with " + features.rows() + " rows");
-        }
-
-        features.putScalar(new int[]{index, 0}, x);
-        features.putScalar(new int[]{index, 1}, y);
-
-        // One-hot encoding
-        for (int i = 0; i < numClasses; i++) {
-            labels.putScalar(new int[]{index, i}, i == classIndex ? 1.0 : 0.0);
-        }
-    }
-
-    private DataSet shuffleDataset(INDArray features, INDArray labels) {
-        int numSamples = features.rows();
+    private DataSet shuffleDataset(DataSet dataset) {
+        int numSamples = (int) dataset.getFeatures().size(0);
         int[] indices = new int[numSamples];
-        for (int i = 0; i < numSamples; i++) {
+        for (int i = 0; i < numSamples; i++)
             indices[i] = i;
-        }
 
         Random random = new Random(seed);
         for (int i = numSamples - 1; i > 0; i--) {
@@ -160,22 +106,18 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
         }
 
         INDArray shuffledFeatures = Nd4j.create(numSamples, 2);
-        INDArray shuffledLabels = Nd4j.create(numSamples, labels.columns());
+        INDArray shuffledLabels = Nd4j.create(numSamples, 1);
 
         for (int i = 0; i < numSamples; i++) {
             int originalIndex = indices[i];
-            shuffledFeatures.putRow(i, features.getRow(originalIndex));
-            shuffledLabels.putRow(i, labels.getRow(originalIndex));
+            shuffledFeatures.putRow(i, dataset.getFeatures().getRow(originalIndex));
+            shuffledLabels.putRow(i, dataset.getLabels().getRow(originalIndex));
         }
 
         return new DataSet(shuffledFeatures, shuffledLabels);
     }
 
-    public double[][][] getTrianglesVertices() {
-        return trianglesVertices;
-    }
-
-    public static void saveToCSV(DataSet dataset, String filename, int numTriangles) {
+    public static void saveToCSV(DataSet dataset, String filename) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println("x,y,class,class_name");
 
@@ -185,18 +127,9 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
             for (int i = 0; i < features.rows(); i++) {
                 double x = features.getDouble(i, 0);
                 double y = features.getDouble(i, 1);
-
-                int classIndex = -1;
-                double maxProb = -1.0;
-                for (int j = 0; j < labels.columns(); j++) {
-                    double prob = labels.getDouble(i, j);
-                    if (prob > maxProb) {
-                        maxProb = prob;
-                        classIndex = j;
-                    }
-                }
-
-                String className = getClassName(classIndex, numTriangles);
+                double label = labels.getDouble(i, 0);
+                int classIndex = label > 0.5 ? 1 : 0;
+                String className = classIndex == 1 ? "inside" : "outside";
 
                 writer.printf("%.6f,%.6f,%d,%s%n", x, y, classIndex, className);
             }
@@ -204,16 +137,6 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
             System.out.println("Датасет треугольников сохранен в: " + filename);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private static String getClassName(int classIndex, int numTriangles) {
-        if (classIndex == 0) {
-            return "outside_all";
-        } else if (classIndex <= numTriangles) {
-            return "triangle_" + classIndex;
-        } else {
-            return "unknown";
         }
     }
 
@@ -232,7 +155,6 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
 
                 String[] parts = line.split(",");
                 if (parts.length >= 2) {
-                    // Формат: x,y,class,class_name - берем только x и y
                     double x = Double.parseDouble(parts[0].trim());
                     double y = Double.parseDouble(parts[1].trim());
 
@@ -244,7 +166,6 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
             e.printStackTrace();
         }
 
-        // Конвертируем List в double[][]
         double[][] pointsArray = new double[pointsList.size()][2];
         for (int i = 0; i < pointsList.size(); i++) {
             pointsArray[i] = pointsList.get(i);

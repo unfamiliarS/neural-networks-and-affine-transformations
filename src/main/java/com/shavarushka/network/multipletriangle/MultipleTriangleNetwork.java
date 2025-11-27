@@ -14,10 +14,8 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 public class MultipleTriangleNetwork {
 
     private static final int modelSeed = 67890;
-    private static final int numTriangles = 2;
 
     public static MultiLayerNetwork create() {
-        int numClasses = numTriangles + 1;
 
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(modelSeed)
@@ -27,20 +25,20 @@ public class MultipleTriangleNetwork {
                 .list()
                 .layer(new DenseLayer.Builder()
                         .nIn(2)
-                        .nOut(2)
-                        .activation(Activation.RELU)
+                        .nOut(6)
+                        .activation(Activation.TANH)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(new DenseLayer.Builder()
-                        .nIn(2)
-                        .nOut(10)
-                        .activation(Activation.RELU)
+                        .nIn(6)
+                        .nOut(2)
+                        .activation(Activation.TANH)
                         .weightInit(WeightInit.XAVIER)
                         .build())
-                .layer(new OutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-                        .nIn(10)
-                        .nOut(numClasses)
-                        .activation(Activation.SOFTMAX)
+                .layer(new OutputLayer.Builder(LossFunctions.LossFunction.XENT)
+                        .nIn(2)
+                        .nOut(1)
+                        .activation(Activation.SIGMOID)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .build();

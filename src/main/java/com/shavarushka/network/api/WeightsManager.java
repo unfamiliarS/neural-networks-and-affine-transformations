@@ -51,6 +51,24 @@ public class WeightsManager {
         }
     }
 
+    public double[] getLayerBiases(int layerIndex) {
+        INDArray biases = model.getLayer(layerIndex).getParam("b");
+        double[] biasesArray = new double[(int) biases.length()];
+        for (int i = 0; i < biases.length(); i++)
+            biasesArray[i] = biases.getDouble(i);
+        
+        return biasesArray;
+    }
+
+    public double[][] getAllBiases() {
+        int numLayers = model.getnLayers();
+        double[][] biases = new double[numLayers][];
+        for (int i = 0; i < numLayers; i++) {
+            biases[i] = getLayerBiases(i);
+        }
+        return biases;
+    }
+
     public void printWeights() {
         double[][][] matrix = getAllWeights();
         for (int i = 0; i < matrix.length; i++) {
@@ -62,7 +80,11 @@ public class WeightsManager {
         }
     }
 
-    public long getLayerParameterCount(int layerIndex) {
-        return model.getLayer(layerIndex).numParams();
+    public void printBiases() {
+        double[][] biases = getAllBiases();
+        for (int i = 0; i < biases.length; i++) {
+            System.out.println("Layer " + i + ":");
+            System.out.println(Arrays.toString(biases[i]));
+        }
     }
 }

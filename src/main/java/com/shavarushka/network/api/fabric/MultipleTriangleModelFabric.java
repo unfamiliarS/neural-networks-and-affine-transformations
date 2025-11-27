@@ -10,11 +10,11 @@ import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.ModelTrainer;
 import com.shavarushka.network.multipletriangle.MultipleTriangleDataGenerator;
 import com.shavarushka.network.multipletriangle.MultipleTriangleNetwork;
-import com.shavarushka.network.multipletriangle.MultipleTrianglePredictor;
+import com.shavarushka.network.triangle.TrianglePredictor;
 
 public class MultipleTriangleModelFabric extends ModelFabric {
 
-    private DataGenerator testDataGenerator = new MultipleTriangleDataGenerator(1000, 2, false);
+    private DataGenerator testDataGenerator = new MultipleTriangleDataGenerator(1000, false);
     private ModelEvaluator evaluator = new GeneratedDataEvaluator(network, testDataGenerator);
 
     public MultipleTriangleModelFabric() {
@@ -32,7 +32,7 @@ public class MultipleTriangleModelFabric extends ModelFabric {
 
     @Override
     public ModelTrainer createTrainer() {
-        DataGenerator trainDataGenerator = new MultipleTriangleDataGenerator(1000, 2, true);
+        DataGenerator trainDataGenerator = new MultipleTriangleDataGenerator(1000, true);
         return new GeneratedDataTrainer(network, trainDataGenerator, evaluator);
     }
 
@@ -43,6 +43,6 @@ public class MultipleTriangleModelFabric extends ModelFabric {
 
     @Override
     public ModelPredictor createPredictor() {
-        return new MultipleTrianglePredictor(network);
+        return new TrianglePredictor(network);
     }
 }
