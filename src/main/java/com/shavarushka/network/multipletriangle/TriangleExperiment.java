@@ -9,10 +9,10 @@ import com.shavarushka.network.api.fabric.ModelFabric;
 import com.shavarushka.network.api.fabric.MultipleTriangleModelFabric;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,12 +28,16 @@ public class TriangleExperiment {
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
-    public void runExperiments(WeightsManager weightsManager, double[][] dataset, double[] trueLabels, double rotationDegrees, String outputPath) {
+    public void runExperiments(WeightsManager weightsManager, double[][] dataset, byte[] trueLabels, double rotationDegrees, String outputPath) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputPath))) {
             writer.println("experiment_id,timestamp,x,y,true_label," +
-                         "before_rotation_prediction,before_rotation_confidence," +
-                         "after_rotation_prediction,after_rotation_confidence," +
-                         "prediction_match,confidence_change");
+                         "before_data_and_weigths_rotation_prediction,before_data_and_weigths_rotation_confidence," +
+                         "after_data_and_before_weigths_rotation_prediction,after_data_and_before_weigths_rotation_confidence," +
+                         "before_data_and_after_weigths_rotation_prediction,before_data_and_after_weigths_rotation_confidence," +
+                         "after_data_and_weigths_rotation_prediction,after_data_and_weigths_rotation_confidence," +
+                         "after_data_and_before_weigths_rotation_prediction_match,after_data_and_before_weigths_rotation_confidence_change," +
+                         "before_data_and_after_weigths_rotation_prediction_match,before_data_and_after_weigths_rotation_confidence_change," +
+                         "after_data_and_weigths_rotation_prediction_match,after_data_and_weigths_rotation_confidence_change");
 
             double[][] originalWeights = weightsManager.getLayerWeights(0);
             double[][] rotatedWeights = AffineTransformations.rotateComplex(originalWeights, rotationDegrees);
@@ -43,21 +47,27 @@ public class TriangleExperiment {
             for (int i = 0; i < dataset.length; i++) {
                 double[] originalPoint = dataset[i];
                 double[] rotatedPoint = rotatedDataSet[i];
-                double trueLabel = trueLabels[i];
+                byte trueLabel = trueLabels[i];
                 
-                // Предсказание для исходной точки
-                PredictionResult beforeRotation = predictor.predict(originalPoint);
+                // Исходные точка и веса
+                PredictionResult beforeAllRotation = predictor.predict(originalPoint);
+                // Повёрнутая точка и исходные веса
+                PredictionResult afterDataBeforeWeigthRotation = predictor.predict(rotatedPoint);
                 
                 weightsManager.setLayerWeights(0, rotatedWeights);
 
-                // Предсказание для повернутой точки
-                PredictionResult afterRotation = predictor.predict(rotatedPoint);
+                // Повёрнутые точка и веса
+                PredictionResult afterAllRotation = predictor.predict(rotatedPoint);
+                // Исходная точка и повёрнутые веса
+                PredictionResult beforeDataAfterWeigthRotation = predictor.predict(originalPoint);
 
                 weightsManager.setLayerWeights(0, originalWeights);
                 
                 String record = createExperimentRecord(
-                    i, originalPoint, trueLabel, beforeRotation, afterRotation
+                    i, originalPoint, trueLabel, beforeAllRotation, afterAllRotation,
+                    afterDataBeforeWeigthRotation, beforeDataAfterWeigthRotation
                 );
+
                 writer.println(record);
                 
                 if (i % 100 == 0) {
@@ -65,40 +75,48 @@ public class TriangleExperiment {
                 }
             }
             
-            System.out.println("Все эксперименты завершены. Результаты сохранены в: " + outputPath);
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String createExperimentRecord(int experimentId, double[] point, double trueLabel,
-                                        PredictionResult before, PredictionResult after) {
+    private String createExperimentRecord(int experimentId, double[] point, byte trueLabel,
+                                        PredictionResult beforeAll, PredictionResult afterAll,
+                                        PredictionResult afterDataBeforeWeigth,
+                                        PredictionResult beforeDataAfterWeigth) {
         double x = point[0];
         double y = point[1];
         String timestamp = dateFormat.format(new Date());
 
-        String beforePrediction = before.getConfidence() > 0.5 ? "in" : "out";
-        String afterPrediction = after.getConfidence() > 0.5 ? "in" : "out";
+        String beforePrediction = beforeAll.getConfidence() > 0.5 ? "in" : "out";
+        String afterPrediction = afterAll.getConfidence() > 0.5 ? "in" : "out";
+        String afterDataBeforeWeigthPrediction = afterDataBeforeWeigth.getConfidence() > 0.5 ? "in" : "out";
+        String beforeDataAfterWeigthPrediction = beforeDataAfterWeigth.getConfidence() > 0.5 ? "in" : "out";
 
         boolean predictionMatch = beforePrediction.equals(afterPrediction);
-        double confidenceChange = after.getConfidence() - before.getConfidence();
+        double confidenceChange = afterAll.getConfidence() - beforeAll.getConfidence();
+        boolean afterDataBeforeWeigthPredictionMatch = beforePrediction.equals(afterDataBeforeWeigthPrediction);
+        double afterDataBeforeWeigthConfidenceChange = afterDataBeforeWeigth.getConfidence() - beforeAll.getConfidence();
+        boolean beforeDataAfterWeigthPredictionMatch = beforePrediction.equals(beforeDataAfterWeigthPrediction);
+        double beforeDataAfterWeigthConfidenceChange = beforeDataAfterWeigth.getConfidence() - beforeAll.getConfidence();
 
-        return String.format("%d,%s,%.6f,%.6f,%.1f,%s,%s,%s,%s,%b,%.6f",
+        return String.format("%d,%s,%f,%f,%d,%s,%f,%s,%f,%s,%f,%s,%f,%b,%f,%b,%f,%b,%f",
             experimentId, timestamp, x, y, trueLabel,
-            beforePrediction, before.getConfidence(),
-            afterPrediction, after.getConfidence(),
+            beforePrediction, beforeAll.getConfidence(),
+            afterDataBeforeWeigthPrediction, afterDataBeforeWeigth.getConfidence(),
+            beforeDataAfterWeigthPrediction, beforeDataAfterWeigth.getConfidence(),
+            afterPrediction, afterAll.getConfidence(),
+            afterDataBeforeWeigthPredictionMatch, afterDataBeforeWeigthConfidenceChange,
+            beforeDataAfterWeigthPredictionMatch, beforeDataAfterWeigthConfidenceChange,
             predictionMatch, confidenceChange
         );
     }
 
     public static DatasetWithLabels loadDatasetWithLabels(String csvPath) {
-        try {
-            java.util.List<double[]> points = new java.util.ArrayList<>();
-            java.util.List<Double> labels = new java.util.ArrayList<>();
-            java.io.BufferedReader reader = new java.io.BufferedReader(
-                new java.io.FileReader(csvPath));
+        List<double[]> points = new ArrayList<>();
+        List<Byte> labels = new ArrayList<>();
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvPath))) {
             String line;
             boolean firstLine = true;
             while ((line = reader.readLine()) != null) {
@@ -110,38 +128,35 @@ public class TriangleExperiment {
                 if (parts.length >= 4) {
                     double x = Double.parseDouble(parts[0].trim());
                     double y = Double.parseDouble(parts[1].trim());
-                    double label = Double.parseDouble(parts[2].trim());
-                    
+                    byte label = Byte.parseByte(parts[2].trim());
+
                     points.add(new double[]{x, y});
                     labels.add(label);
                 }
             }
-            reader.close();
-            
-            double[][] pointsArray = points.toArray(new double[0][]);
-            double[] labelsArray = new double[labels.size()];
-            for (int i = 0; i < labels.size(); i++) {
-                labelsArray[i] = labels.get(i);
-            }
-            
-            return new DatasetWithLabels(pointsArray, labelsArray);
-            
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            return new DatasetWithLabels(new double[0][], new double[0]);
         }
+        
+        double[][] pointsArray = points.toArray(new double[0][]);
+        byte[] labelsArray = new byte[labels.size()];
+        for (int i = 0; i < labels.size(); i++)
+            labelsArray[i] = labels.get(i);
+        
+        return new DatasetWithLabels(pointsArray, labelsArray);
     }
 
     public static class DatasetWithLabels {
         public double[][] points;
-        public double[] labels;
+        public byte[] labels;
         
-        public DatasetWithLabels(double[][] points, double[] labels) {
+        public DatasetWithLabels(double[][] points, byte[] labels) {
             this.points = points;
             this.labels = labels;
         }
     }
-
     public static void main(String[] args) {
         ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangles.zip"));
         ModelPredictor predictor = fabric.createPredictor();
@@ -151,136 +166,12 @@ public class TriangleExperiment {
         
         DatasetWithLabels data = loadDatasetWithLabels("src/main/python/multipletriangle/dataset.csv");
         
-        double[] rotationAngles = {30.0, 45.0, 124.0, 256.0};
-        
+        double[] rotationAngles = {136, 256.52, 191, 347};
+
         for (double angle : rotationAngles) {
             String outputPath = String.format("experiment_results_%.0fdeg.csv", angle);
             System.out.println("\nЗапуск экспериментов с поворотом на " + angle + " градусов...");
-            experiment.runExperiments(weightsManager, data.points, data.labels, angle, outputPath);
-            
-            ExperimentAnalyzer.analyzeResults(outputPath, angle);
-        }
-    }
-}
-
-class ExperimentAnalyzer {
-    
-    public static void analyzeResults(String resultsPath, double rotationAngle) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(resultsPath))) {
-            String line;
-            List<ExperimentRecord> records = new ArrayList<>();
-            
-            reader.readLine();
-            
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 11) {
-                    ExperimentRecord record = new ExperimentRecord(parts);
-                    records.add(record);
-                }
-            }
-            
-            printAnalysis(records, rotationAngle);
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private static void printAnalysis(List<ExperimentRecord> records, double rotationAngle) {
-        int total = records.size();
-        int predictionMatches = 0;
-        int correctBefore = 0;
-        int correctAfter = 0;
-        double totalConfidenceChange = 0;
-        double avgConfidenceBefore = 0;
-        double avgConfidenceAfter = 0;
-        
-        for (ExperimentRecord record : records) {
-            if (record.predictionMatch) predictionMatches++;
-            
-            boolean isCorrectBefore = record.beforePrediction.equals(
-                record.trueLabel > 0.5 ? "in" : "out");
-            boolean isCorrectAfter = record.afterPrediction.equals(
-                record.trueLabel > 0.5 ? "in" : "out");
-            
-            if (isCorrectBefore) correctBefore++;
-            if (isCorrectAfter) correctAfter++;
-            
-            totalConfidenceChange += record.confidenceChange;
-            avgConfidenceBefore += record.beforeConfidence;
-            avgConfidenceAfter += record.afterConfidence;
-        }
-        
-        avgConfidenceBefore /= total;
-        avgConfidenceAfter /= total;
-        
-        System.out.println("\n=== АНАЛИЗ РЕЗУЛЬТАТОВ (поворот " + rotationAngle + "°) ===");
-        System.out.println("Всего экспериментов: " + total);
-        System.out.printf("Точность до поворота: %.2f%%\n", (correctBefore * 100.0 / total));
-        System.out.printf("Точность после поворота: %.2f%%\n", (correctAfter * 100.0 / total));
-        System.out.printf("Совпадение предсказаний: %.2f%%\n", (predictionMatches * 100.0 / total));
-        System.out.printf("Средняя уверенность до: %.6f\n", avgConfidenceBefore);
-        System.out.printf("Средняя уверенность после: %.6f\n", avgConfidenceAfter);
-        System.out.printf("Среднее изменение уверенности: %.6f\n", (totalConfidenceChange / total));
-        
-        analyzeByClass(records);
-    }
-    
-    private static void analyzeByClass(List<ExperimentRecord> records) {
-        int insidePoints = 0;
-        int outsidePoints = 0;
-        int insideMatches = 0;
-        int outsideMatches = 0;
-        double insideConfidenceChange = 0;
-        double outsideConfidenceChange = 0;
-        
-        for (ExperimentRecord record : records) {
-            if (record.trueLabel > 0.5) {
-                insidePoints++;
-                if (record.predictionMatch) insideMatches++;
-                insideConfidenceChange += record.confidenceChange;
-            } else {
-                outsidePoints++;
-                if (record.predictionMatch) outsideMatches++;
-                outsideConfidenceChange += record.confidenceChange;
-            }
-        }
-        
-        System.out.println("\n--- Анализ по классам ---");
-        System.out.printf("Точки внутри треугольников: %d\n", insidePoints);
-        System.out.printf("Совпадение предсказаний для 'inside': %.2f%%\n", 
-                         (insideMatches * 100.0 / insidePoints));
-        System.out.printf("Среднее изменение уверенности для 'inside': %.6f\n",
-                         (insideConfidenceChange / insidePoints));
-        
-        System.out.printf("Точки снаружи треугольников: %d\n", outsidePoints);
-        System.out.printf("Совпадение предсказаний для 'outside': %.2f%%\n", 
-                         (outsideMatches * 100.0 / outsidePoints));
-        System.out.printf("Среднее изменение уверенности для 'outside': %.6f\n",
-                         (outsideConfidenceChange / outsidePoints));
-    }
-    
-    private static class ExperimentRecord {
-        int experimentId;
-        double x, y;
-        double trueLabel;
-        String beforePrediction, afterPrediction;
-        double beforeConfidence, afterConfidence;
-        boolean predictionMatch;
-        double confidenceChange;
-        
-        ExperimentRecord(String[] parts) {
-            this.experimentId = Integer.parseInt(parts[0]);
-            this.x = Double.parseDouble(parts[2]);
-            this.y = Double.parseDouble(parts[3]);
-            this.trueLabel = Double.parseDouble(parts[4]);
-            this.beforePrediction = parts[5];
-            this.beforeConfidence = Double.parseDouble(parts[6]);
-            this.afterPrediction = parts[7];
-            this.afterConfidence = Double.parseDouble(parts[8]);
-            this.predictionMatch = Boolean.parseBoolean(parts[9]);
-            this.confidenceChange = Double.parseDouble(parts[10]);
+            experiment.runExperiments(weightsManager, data.points, data.labels, angle, outputPath);   
         }
     }
 }
