@@ -2,7 +2,8 @@ package com.shavarushka.network.triangle;
 
 import java.util.Arrays;
 
-import com.shavarushka.affine.AffineTransformations;
+import com.shavarushka.affine.AffineTransformation;
+import com.shavarushka.affine.RotationMatrixProvider;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.WeightsManager;
@@ -15,14 +16,18 @@ public class Main {
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
+
+        double rotationDegr = 180;
+        AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
+                                                                                .setAngle(rotationDegr));
+
         System.out.println();
         weightsManager.printWeights();
         System.out.println();
 
-        double rotationDegr = 180;
 
         double[][] dataset = TriangleDataGenerator.getFromCSV("src/main/python/triangle/dataset.csv");
-        double[][] rotatedDataSet = AffineTransformations.rotate(dataset, 0, 1, rotationDegr);
+        double[][] rotatedDataSet = affineTransformation.transform(dataset, 0, 1);
         int dataSetSampleIndex = 6;
         double[] dataSetSample = dataset[dataSetSampleIndex];
         double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
@@ -45,7 +50,7 @@ public class Main {
             System.out.println(Arrays.toString(rotatedDataSet[i]));
 
         double[][][] allWeights = weightsManager.getAllWeights();
-        double[][] rotatedWeights = AffineTransformations.rotate(allWeights[0], 0, 1, rotationDegr);
+        double[][] rotatedWeights = affineTransformation.transform(allWeights[0], 0, 1);
         weightsManager.setLayerWeights(0, rotatedWeights);
 
         System.out.println();

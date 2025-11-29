@@ -1,6 +1,7 @@
 package com.shavarushka.network.multipletriangle;
 
-import com.shavarushka.affine.AffineTransformations;
+import com.shavarushka.affine.AffineTransformation;
+import com.shavarushka.affine.RotationMatrixProvider;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.PredictionResult;
@@ -39,10 +40,13 @@ public class TriangleExperiment {
                          "before_data_and_after_weigths_rotation_prediction_match,before_data_and_after_weigths_rotation_confidence_change," +
                          "after_data_and_weigths_rotation_prediction_match,after_data_and_weigths_rotation_confidence_change");
 
+            AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
+                                                                                    .setAngle(rotationDegrees));
+
             double[][] originalWeights = weightsManager.getLayerWeights(0);
-            double[][] rotatedWeights = AffineTransformations.rotateComplex(originalWeights, rotationDegrees);
+            double[][] rotatedWeights = affineTransformation.transformComplex(originalWeights);
             
-            double[][] rotatedDataSet = AffineTransformations.rotateComplex(dataset, rotationDegrees);
+            double[][] rotatedDataSet = affineTransformation.transformComplex(dataset);
 
             for (int i = 0; i < dataset.length; i++) {
                 double[] originalPoint = dataset[i];

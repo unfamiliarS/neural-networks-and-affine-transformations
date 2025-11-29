@@ -2,7 +2,8 @@ package com.shavarushka.network.multipletriangle;
 
 import java.util.Arrays;
 
-import com.shavarushka.affine.AffineTransformations;
+import com.shavarushka.affine.AffineTransformation;
+import com.shavarushka.affine.RotationMatrixProvider;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.WeightsManager;
@@ -16,6 +17,10 @@ public class Main {
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
 
+        double rotationDegr = 256;
+        AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
+                                                                                .setAngle(rotationDegr));
+
         System.out.println();
         System.out.println("Weights:");
         weightsManager.printWeights();
@@ -24,10 +29,8 @@ public class Main {
         weightsManager.printBiases();
         System.out.println();
 
-        double rotationDegr = 256;
-
         double[][] dataset = MultipleTriangleDataGenerator.getFromCSV("src/main/python/multipletriangle/dataset.csv");
-        double[][] rotatedDataSet = AffineTransformations.rotateComplex(dataset, rotationDegr);
+        double[][] rotatedDataSet = affineTransformation.transformComplex(dataset);
         int dataSetSampleIndex = 3;
         System.out.println("Data sample: " + Arrays.toString(dataset[dataSetSampleIndex]) + "\n");
         double[] dataSetSample = dataset[dataSetSampleIndex];
@@ -51,7 +54,7 @@ public class Main {
             System.out.println(Arrays.toString(rotatedDataSet[i]));
 
         double[][][] allWeights = weightsManager.getAllWeights();
-        double[][] rotatedWeights = AffineTransformations.rotateComplex(allWeights[0], rotationDegr);
+        double[][] rotatedWeights = affineTransformation.transformComplex(allWeights[0]);
         weightsManager.setLayerWeights(0, rotatedWeights);
 
         System.out.println();

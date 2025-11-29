@@ -3,8 +3,9 @@ package com.shavarushka.network.mnist;
 import java.io.File;
 import java.io.IOException;
 
-import com.shavarushka.affine.AffineTransformations;
+import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.MatrixUtils;
+import com.shavarushka.affine.RotationMatrixProvider;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.NeuronActivationHandler;
 import com.shavarushka.network.api.WeightsManager;
@@ -17,12 +18,14 @@ public class Main {
 
         WeightsManager weightsManager = fabric.createWeightsManager();
         MNISTPredictor predictor = (MNISTPredictor) fabric.createPredictor();
-
+        
         double rotationDegr = 256;
+        AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
+                                                                            .setAngle(rotationDegr));
 
         double[][] imageData = ImageHandler.load(new File("src/main/resources/mnist-nums/8_005839.png"));
         double[][] flattenImageData = new double[][]{ImageHandler.flattenImage(imageData)};
-        double[][] rotatedImageData = AffineTransformations.rotateComplex(flattenImageData, rotationDegr);
+        double[][] rotatedImageData = affineTransformation.transformComplex(flattenImageData);
 
         MatrixUtils.printMatrix(flattenImageData);
         System.out.println();
@@ -46,7 +49,7 @@ public class Main {
         int layerIndex = 0;
         double[][] origLayerWeights = weightsManager.getLayerWeights(layerIndex);
         double[][] rotatedWeights;
-        rotatedWeights = AffineTransformations.rotateComplex(origLayerWeights, rotationDegr);
+        rotatedWeights = affineTransformation.transformComplex(origLayerWeights);
         weightsManager.setLayerWeights(layerIndex, rotatedWeights);
 
         System.out.println("After weight rotation on " + rotationDegr);
