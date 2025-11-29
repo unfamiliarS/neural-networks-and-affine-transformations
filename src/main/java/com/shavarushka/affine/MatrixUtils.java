@@ -10,6 +10,11 @@ public class MatrixUtils {
         return matrixA.mult(matrixB).toArray2();
     }
 
+    public static double[][] inverse(double[][] matrix) {
+        SimpleMatrix simpleMatrix = new SimpleMatrix(matrix);
+        return simpleMatrix.invert().toArray2();
+    }
+
     public static double[][] multiplyWithTranspose(double[][] rotationMatrix, double[][] coordinates) {
         SimpleMatrix rot = new SimpleMatrix(rotationMatrix);
         SimpleMatrix coords = new SimpleMatrix(coordinates);

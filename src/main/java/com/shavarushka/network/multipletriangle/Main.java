@@ -3,7 +3,7 @@ package com.shavarushka.network.multipletriangle;
 import java.util.Arrays;
 
 import com.shavarushka.affine.AffineTransformation;
-import com.shavarushka.affine.RotationMatrixProvider;
+import com.shavarushka.affine.ScaleAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.WeightsManager;
@@ -18,8 +18,8 @@ public class Main {
         WeightsManager weightsManager = fabric.createWeightsManager();
 
         double rotationDegr = 256;
-        AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
-                                                                                .setAngle(rotationDegr));
+        AffineTransformation affineTransformation = new ScaleAffineTransformation()
+                                                        .scaleFactor(5);
 
         System.out.println();
         System.out.println("Weights:");
@@ -30,7 +30,8 @@ public class Main {
         System.out.println();
 
         double[][] dataset = MultipleTriangleDataGenerator.getFromCSV("src/main/python/multipletriangle/dataset.csv");
-        double[][] rotatedDataSet = affineTransformation.transformComplex(dataset);
+        ((ScaleAffineTransformation) affineTransformation).setMatrixType(true);
+        double[][] rotatedDataSet = affineTransformation.transform(dataset);
         int dataSetSampleIndex = 3;
         System.out.println("Data sample: " + Arrays.toString(dataset[dataSetSampleIndex]) + "\n");
         double[] dataSetSample = dataset[dataSetSampleIndex];
@@ -54,8 +55,17 @@ public class Main {
             System.out.println(Arrays.toString(rotatedDataSet[i]));
 
         double[][][] allWeights = weightsManager.getAllWeights();
-        double[][] rotatedWeights = affineTransformation.transformComplex(allWeights[0]);
+        ((ScaleAffineTransformation) affineTransformation).setMatrixType(false);
+        double[][] rotatedWeights = affineTransformation.transform(allWeights[0]);
         weightsManager.setLayerWeights(0, rotatedWeights);
+
+        System.out.println();
+        System.out.println("Weights:");
+        weightsManager.printWeights();
+        System.out.println();
+        System.out.println("Biases:");
+        weightsManager.printBiases();
+        System.out.println();
 
         System.out.println();
         System.out.println("After weight rotation on " + rotationDegr);

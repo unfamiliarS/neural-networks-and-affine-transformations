@@ -1,7 +1,6 @@
 package com.shavarushka.network.mnist;
 
-import com.shavarushka.affine.AffineTransformation;
-import com.shavarushka.affine.RotationMatrixProvider;
+import com.shavarushka.affine.ScaleAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.PredictionResult;
@@ -38,13 +37,15 @@ public class MNISTExperiment {
                          "before_data_and_after_weigths_rotation_prediction_match,before_data_and_after_weigths_rotation_confidence_change," +
                          "after_data_and_weigths_rotation_prediction_match,after_data_and_weigths_rotation_confidence_change");
 
-            AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
-                                                                                    .setAngle(rotationDegrees));
+            ScaleAffineTransformation affineTransformation = new ScaleAffineTransformation()
+                                                            .scaleFactor(5);
             
             double[][] originalWeights = weightsManager.getLayerWeights(0);
-            double[][] rotatedWeights = affineTransformation.transformComplex(originalWeights);
+            affineTransformation.setMatrixType(false);
+            double[][] rotatedWeights = affineTransformation.transform(originalWeights);
             
-            double[][] rotatedDataSet = affineTransformation.transformComplex(dataset);
+            affineTransformation.setMatrixType(true);
+            double[][] rotatedDataSet = affineTransformation.transform(dataset);
 
             for (int i = 0; i < dataset.length; i++) {
                 double[] originalData = dataset[i];
@@ -159,14 +160,13 @@ public class MNISTExperiment {
         WeightsManager weightsManager = fabric.createWeightsManager();
         
         MNISTExperiment experiment = new MNISTExperiment(predictor);
-        
-        MnistDataSet data = loadRandomMnistImages("/home/semyon/Documents/mnist", 100);
+
+        MnistDataSet data = loadRandomMnistImages("src/main/resources/test", 100);
         
         double[] rotationAngles = {256.52};
 
         for (double angle : rotationAngles) {
-            String outputPath = String.format("experiment_results_%.0fdeg.csv", angle);
-            System.out.println("\nЗапуск экспериментов с поворотом на " + angle + " градусов...");
+            String outputPath = String.format("mnist_scale_experiment_%.0fdeg.csv", angle);
             experiment.runExperiments(weightsManager, data.flattenImages, data.numbers, angle, outputPath);   
         }
     }

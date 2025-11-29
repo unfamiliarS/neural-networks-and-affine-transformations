@@ -1,7 +1,8 @@
 package com.shavarushka.network.multipletriangle;
 
 import com.shavarushka.affine.AffineTransformation;
-import com.shavarushka.affine.RotationMatrixProvider;
+import com.shavarushka.affine.RotationAffineTransformation;
+import com.shavarushka.affine.ScaleAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.PredictionResult;
@@ -14,39 +15,34 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.FileReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class TriangleExperiment {
 
     private ModelPredictor predictor;
-    private SimpleDateFormat dateFormat;
 
     public TriangleExperiment(ModelPredictor predictor) {
         this.predictor = predictor;
-        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
 
     public void runExperiments(WeightsManager weightsManager, double[][] dataset, byte[] trueLabels, double rotationDegrees, String outputPath) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(outputPath))) {
-            writer.println("experiment_id,timestamp,x,y,true_label," +
-                         "before_data_and_weigths_rotation_prediction,before_data_and_weigths_rotation_confidence," +
-                         "after_data_and_before_weigths_rotation_prediction,after_data_and_before_weigths_rotation_confidence," +
-                         "before_data_and_after_weigths_rotation_prediction,before_data_and_after_weigths_rotation_confidence," +
-                         "after_data_and_weigths_rotation_prediction,after_data_and_weigths_rotation_confidence," +
-                         "after_data_and_before_weigths_rotation_prediction_match,after_data_and_before_weigths_rotation_confidence_change," +
-                         "before_data_and_after_weigths_rotation_prediction_match,before_data_and_after_weigths_rotation_confidence_change," +
-                         "after_data_and_weigths_rotation_prediction_match,after_data_and_weigths_rotation_confidence_change");
+            writer.println("experiment_id,x,y,true_label," +
+                         "before_data_and_weigths_transformation_prediction,before_data_and_weigths_transformation_confidence," +
+                         "after_data_and_before_weigths_transformation_prediction,after_data_and_before_weigths_transformation_confidence," +
+                         "before_data_and_after_weigths_transformation_prediction,before_data_and_after_weigths_transformation_confidence," +
+                         "after_data_and_weigths_transformation_prediction,after_data_and_weigths_transformation_confidence," +
+                         "after_data_and_before_weigths_transformation_prediction_match,after_data_and_before_weigths_transformation_confidence_change," +
+                         "before_data_and_after_weigths_transformation_prediction_match,before_data_and_after_weigths_transformation_confidence_change," +
+                         "after_data_and_weigths_transformation_prediction_match,after_data_and_weigths_transformation_confidence_change");
 
-            AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
-                                                                                    .setAngle(rotationDegrees));
+            AffineTransformation affineTransformation = new RotationAffineTransformation().setAngle(256);
 
             double[][] originalWeights = weightsManager.getLayerWeights(0);
-            double[][] rotatedWeights = affineTransformation.transformComplex(originalWeights);
+            double[][] rotatedWeights = affineTransformation.transform(originalWeights);
             
-            double[][] rotatedDataSet = affineTransformation.transformComplex(dataset);
+            double[][] rotatedDataSet = affineTransformation.transform(dataset);
 
             for (int i = 0; i < dataset.length; i++) {
                 double[] originalPoint = dataset[i];
@@ -54,22 +50,22 @@ public class TriangleExperiment {
                 byte trueLabel = trueLabels[i];
                 
                 // Исходные точка и веса
-                PredictionResult beforeAllRotation = predictor.predict(originalPoint);
+                PredictionResult beforeAllTransformation = predictor.predict(originalPoint);
                 // Повёрнутая точка и исходные веса
-                PredictionResult afterDataBeforeWeigthRotation = predictor.predict(rotatedPoint);
+                PredictionResult afterDataBeforeWeigthTransformation = predictor.predict(rotatedPoint);
                 
                 weightsManager.setLayerWeights(0, rotatedWeights);
 
                 // Повёрнутые точка и веса
-                PredictionResult afterAllRotation = predictor.predict(rotatedPoint);
+                PredictionResult afterAllTransformation = predictor.predict(rotatedPoint);
                 // Исходная точка и повёрнутые веса
-                PredictionResult beforeDataAfterWeigthRotation = predictor.predict(originalPoint);
+                PredictionResult beforeDataAfterWeigthTransformation = predictor.predict(originalPoint);
 
                 weightsManager.setLayerWeights(0, originalWeights);
                 
                 String record = createExperimentRecord(
-                    i, originalPoint, trueLabel, beforeAllRotation, afterAllRotation,
-                    afterDataBeforeWeigthRotation, beforeDataAfterWeigthRotation
+                    i, originalPoint, trueLabel, beforeAllTransformation, afterAllTransformation,
+                    afterDataBeforeWeigthTransformation, beforeDataAfterWeigthTransformation
                 );
 
                 writer.println(record);
@@ -90,7 +86,6 @@ public class TriangleExperiment {
                                         PredictionResult beforeDataAfterWeigth) {
         double x = point[0];
         double y = point[1];
-        String timestamp = dateFormat.format(new Date());
 
         String beforePrediction = beforeAll.getConfidence() > 0.5 ? "in" : "out";
         String afterPrediction = afterAll.getConfidence() > 0.5 ? "in" : "out";
@@ -104,8 +99,8 @@ public class TriangleExperiment {
         boolean beforeDataAfterWeigthPredictionMatch = beforePrediction.equals(beforeDataAfterWeigthPrediction);
         double beforeDataAfterWeigthConfidenceChange = beforeDataAfterWeigth.getConfidence() - beforeAll.getConfidence();
 
-        return String.format("%d,%s,%f,%f,%d,%s,%f,%s,%f,%s,%f,%s,%f,%b,%f,%b,%f,%b,%f",
-            experimentId, timestamp, x, y, trueLabel,
+        return String.format("%d,%f,%f,%d,%s,%f,%s,%f,%s,%f,%s,%f,%b,%f,%b,%f,%b,%f",
+            experimentId, x, y, trueLabel,
             beforePrediction, beforeAll.getConfidence(),
             afterDataBeforeWeigthPrediction, afterDataBeforeWeigth.getConfidence(),
             beforeDataAfterWeigthPrediction, beforeDataAfterWeigth.getConfidence(),
@@ -170,11 +165,10 @@ public class TriangleExperiment {
         
         DatasetWithLabels data = loadDatasetWithLabels("src/main/python/multipletriangle/dataset.csv");
         
-        double[] rotationAngles = {136, 256.52, 191, 347};
+        double[] rotationAngles = {256.52};
 
         for (double angle : rotationAngles) {
-            String outputPath = String.format("experiment_results_%.0fdeg.csv", angle);
-            System.out.println("\nЗапуск экспериментов с поворотом на " + angle + " градусов...");
+            String outputPath = String.format("two_triangle_experiment_rotate_%.0fdeg.csv", angle);
             experiment.runExperiments(weightsManager, data.points, data.labels, angle, outputPath);   
         }
     }

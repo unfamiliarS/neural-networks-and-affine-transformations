@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.MatrixUtils;
-import com.shavarushka.affine.RotationMatrixProvider;
+import com.shavarushka.affine.RotationAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.NeuronActivationHandler;
@@ -42,11 +42,11 @@ public class RotationCommand implements Command {
         WeightsManager weightsManager = fabric.createWeightsManager();
         ModelPredictor predictor = fabric.createPredictor();
 
-        AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
-                                                                                .setAngle(rotationAngle));
+        AffineTransformation affineTransformation = new RotationAffineTransformation()
+                                                            .setAngle(rotationAngle);
 
         double[][] data = new double[][]{dataExtractor.extract()};
-        double[][] rotatedData = affineTransformation.transformComplex(data);
+        double[][] rotatedData = affineTransformation.transform(data);
 
         System.out.println();
         MatrixUtils.printMatrix(data);
@@ -70,7 +70,7 @@ public class RotationCommand implements Command {
 
         int layerIndex = 0;
         double[][] origLayerWeights = weightsManager.getLayerWeights(layerIndex);
-        double[][] rotatedWeights = affineTransformation.transformComplex(origLayerWeights);
+        double[][] rotatedWeights = affineTransformation.transform(origLayerWeights);
         weightsManager.setLayerWeights(layerIndex, rotatedWeights);
 
         System.out.println();

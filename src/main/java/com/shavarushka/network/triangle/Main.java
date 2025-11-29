@@ -2,10 +2,11 @@ package com.shavarushka.network.triangle;
 
 import java.util.Arrays;
 
-import com.shavarushka.affine.AffineTransformation;
-import com.shavarushka.affine.RotationMatrixProvider;
+import com.shavarushka.affine.MatrixUtils;
+import com.shavarushka.affine.ScaleAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
+import com.shavarushka.network.api.NeuronActivationHandler;
 import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.ModelFabric;
 import com.shavarushka.network.api.fabric.TriangleModelFabric;
@@ -18,20 +19,23 @@ public class Main {
         WeightsManager weightsManager = fabric.createWeightsManager();
 
         double rotationDegr = 180;
-        AffineTransformation affineTransformation = new AffineTransformation(new RotationMatrixProvider()
-                                                                                .setAngle(rotationDegr));
+        ScaleAffineTransformation affineTransformation = new ScaleAffineTransformation()
+                                                                .scaleFactor(5);
 
         System.out.println();
         weightsManager.printWeights();
         System.out.println();
-
-
+        
+        
         double[][] dataset = TriangleDataGenerator.getFromCSV("src/main/python/triangle/dataset.csv");
-        double[][] rotatedDataSet = affineTransformation.transform(dataset, 0, 1);
+        affineTransformation.setMatrixType(true);
+        double[][] rotatedDataSet = affineTransformation.transform(dataset);
         int dataSetSampleIndex = 6;
         double[] dataSetSample = dataset[dataSetSampleIndex];
         double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
 
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), dataSetSample));
+        
         System.out.println("Before weight rotation");
         System.out.println();
         System.out.println(predictor.predict(dataSetSample));
@@ -50,8 +54,14 @@ public class Main {
             System.out.println(Arrays.toString(rotatedDataSet[i]));
 
         double[][][] allWeights = weightsManager.getAllWeights();
-        double[][] rotatedWeights = affineTransformation.transform(allWeights[0], 0, 1);
+        affineTransformation.setMatrixType(false);
+        double[][] rotatedWeights = affineTransformation.transform(allWeights[0]);
         weightsManager.setLayerWeights(0, rotatedWeights);
+
+        System.out.println();
+        weightsManager.printWeights();
+        System.out.println();
+        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), rotatedDataSetSample));
 
         System.out.println();
         System.out.println("After weight rotation on " + rotationDegr);
