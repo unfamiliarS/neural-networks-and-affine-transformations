@@ -9,6 +9,7 @@ import org.apache.commons.cli.Option;
 
 import com.shavarushka.cli.commands.Command;
 import com.shavarushka.cli.commands.RotationCommand;
+import com.shavarushka.cli.commands.ScaleCommand;
 
 public class CommandManager {
 
@@ -21,6 +22,7 @@ public class CommandManager {
         requiredArgs = new RequiredArgsParser().parse();
 
         register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));
+        register(new ScaleCommand(requiredArgs, parsedCommands.getOptionValue("scale")));
     }
 
     private void register(Command command) {

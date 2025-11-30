@@ -45,6 +45,14 @@ public interface CLIOptions {
                 .desc("Affine rotation transformation example data ('x,y' point and MNIST 28x28 image supported) and neural network weights")
                 .build());
 
+        options.addOption(Option.builder()
+                .longOpt("scale")
+                .hasArg(true)
+                .argName("scaleFactor")
+                .valueSeparator('=')
+                .desc("Affine scale transformation example data ('x,y' point and MNIST 28x28 image supported) and neural network weights")
+                .build());
+
         return options;
     }
 }

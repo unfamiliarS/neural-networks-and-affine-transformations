@@ -17,6 +17,7 @@ public class Main {
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
+        NeuronActivationHandler neuronActivationHandler = fabric.createNeuronActivationHander();
 
         double rotationDegr = 180;
         ScaleAffineTransformation affineTransformation = new ScaleAffineTransformation()
@@ -34,7 +35,7 @@ public class Main {
         double[] dataSetSample = dataset[dataSetSampleIndex];
         double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
 
-        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), dataSetSample));
+        MatrixUtils.printMatrix(neuronActivationHandler.getAllLayerActivationsAsArrays(dataSetSample));
         
         System.out.println("Before weight rotation");
         System.out.println();
@@ -61,7 +62,7 @@ public class Main {
         System.out.println();
         weightsManager.printWeights();
         System.out.println();
-        MatrixUtils.printMatrix(NeuronActivationHandler.getAllLayerActivationsAsArrays(fabric.createNetwork(), rotatedDataSetSample));
+        MatrixUtils.printMatrix(neuronActivationHandler.getAllLayerActivationsAsArrays(rotatedDataSetSample));
 
         System.out.println();
         System.out.println("After weight rotation on " + rotationDegr);

@@ -8,13 +8,19 @@ import org.nd4j.linalg.factory.Nd4j;
 
 public class NeuronActivationHandler {
 
-    public static double[] getLayerActivationsAsArray(MultiLayerNetwork network, int layerIndex, double[] inputVector) {
-        INDArray activations = getLayerActivations(network, layerIndex, inputVector);
+    private MultiLayerNetwork network;
+
+    public NeuronActivationHandler(MultiLayerNetwork network) {
+        this.network = network;
+    }
+
+    public double[] getLayerActivationsAsArray(int layerIndex, double[] inputVector) {
+        INDArray activations = getLayerActivations(layerIndex, inputVector);
         return activations.toDoubleVector();
     }
 
-    public static double[][] getAllLayerActivationsAsArrays(MultiLayerNetwork network, double[] inputVector) {
-        List<INDArray> activationsArrays = getAllLayerActivations(network, inputVector);
+    public double[][] getAllLayerActivationsAsArrays(double[] inputVector) {
+        List<INDArray> activationsArrays = getAllLayerActivations(inputVector);
         double[][] result = new double[activationsArrays.size()][];
         
         for (int i = 0; i < activationsArrays.size(); i++)
@@ -23,8 +29,8 @@ public class NeuronActivationHandler {
         return result;
     }
 
-    public static INDArray getLayerActivations(MultiLayerNetwork network, int layerIndex, double[] inputVector) {
-        List<INDArray> activations = getAllLayerActivations(network, inputVector);
+    public INDArray getLayerActivations(int layerIndex, double[] inputVector) {
+        List<INDArray> activations = getAllLayerActivations(inputVector);
         if (layerIndex < 0 || layerIndex >= activations.size()) {
             throw new IllegalArgumentException("Invalid layer index: " + layerIndex + 
                     ". Network has " + activations.size() + " layers.");
@@ -32,7 +38,7 @@ public class NeuronActivationHandler {
         return activations.get(layerIndex);
     }
 
-    public static List<INDArray> getAllLayerActivations(MultiLayerNetwork network, double[] inputVector) {
+    public List<INDArray> getAllLayerActivations(double[] inputVector) {
         INDArray input = Nd4j.create(inputVector).reshape(1, inputVector.length);
         return network.feedForward(input);
     }

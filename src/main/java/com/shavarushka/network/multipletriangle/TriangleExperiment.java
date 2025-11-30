@@ -2,7 +2,6 @@ package com.shavarushka.network.multipletriangle;
 
 import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.RotationAffineTransformation;
-import com.shavarushka.affine.ScaleAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.PredictionResult;
