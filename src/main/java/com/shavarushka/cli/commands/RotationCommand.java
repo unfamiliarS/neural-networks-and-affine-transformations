@@ -52,7 +52,7 @@ public class RotationCommand implements Command {
         ModelPredictor predictor = fabric.createPredictor();
 
         AffineTransformation affineTransformation = new RotationAffineTransformation()
-                                                            .setAngle(rotationAngle);
+                                                            .angle(rotationAngle);
 
         double[][] data = new double[][]{dataExtractor.extract()};
         double[][] rotatedData = affineTransformation.transform(data);

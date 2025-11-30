@@ -4,7 +4,7 @@ public class RotationAffineTransformation extends AffineTransformation {
 
     private double angleDegrees;
 
-    public RotationAffineTransformation setAngle(double angle) {
+    public RotationAffineTransformation angle(double angle) {
         angleDegrees = angle;
         return this;
     }
@@ -14,8 +14,8 @@ public class RotationAffineTransformation extends AffineTransformation {
         int n = coordinates[0].length;
 
         double[][] affineMatrix = createAffineMatrix(n);
-        
-        double[][] transformed = MatrixUtils.multiplyWithTranspose(MatrixUtils.inverse(affineMatrix), coordinates);
+
+        double[][] transformed = MatrixUtils.multiplyWithTranspose(affineMatrix, coordinates);
 
         return transformed;
     }
@@ -25,16 +25,16 @@ public class RotationAffineTransformation extends AffineTransformation {
         double[][][] affineMatrices = new double[dimensions-1][dimensions][dimensions];
 
         for (int i = 0; i < dimensions-1; i++)
-            affineMatrices[i] = createTwoAxesAffineMatrix(dimensions, i, i+1);
+            affineMatrices[i] = createSimpleAffineMatrix(dimensions, i, i+1);
 
         double[][] result = affineMatrices[0];
-        for (int i = 1; i < dimensions - 1; i++)
+        for (int i = 1; i < dimensions-1; i++)
             result = MatrixUtils.multiplyMatrices(result, affineMatrices[i]);
 
         return result;
     }
 
-    private double[][] createTwoAxesAffineMatrix(int dimensions, int axis1, int axis2) {
+    private double[][] createSimpleAffineMatrix(int dimensions, int axis1, int axis2) {
         double[][] matrix = createIdentityMatrix(dimensions);
 
         double cos = Math.cos(angleDegrees);

@@ -36,7 +36,7 @@ public class TriangleExperiment {
                          "before_data_and_after_weigths_transformation_prediction_match,before_data_and_after_weigths_transformation_confidence_change," +
                          "after_data_and_weigths_transformation_prediction_match,after_data_and_weigths_transformation_confidence_change");
 
-            AffineTransformation affineTransformation = new RotationAffineTransformation().setAngle(256);
+            AffineTransformation affineTransformation = new RotationAffineTransformation().angle(rotationDegrees);
 
             double[][] originalWeights = weightsManager.getLayerWeights(0);
             double[][] rotatedWeights = affineTransformation.transform(originalWeights);

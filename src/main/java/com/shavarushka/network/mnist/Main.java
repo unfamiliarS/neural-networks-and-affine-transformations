@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.shavarushka.affine.MatrixUtils;
 import com.shavarushka.affine.ScaleAffineTransformation;
+import com.shavarushka.affine.ShearAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.NeuronActivationHandler;
 import com.shavarushka.network.api.WeightsManager;
@@ -13,17 +14,17 @@ import com.shavarushka.network.api.fabric.ModelFabric;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/mnist-model.zip"));
+        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/simple-mnist.zip"));
 
         WeightsManager weightsManager = fabric.createWeightsManager();
         NeuronActivationHandler neuronActivationHandler = fabric.createNeuronActivationHander();
         MNISTPredictor predictor = (MNISTPredictor) fabric.createPredictor();
         
         double rotationDegr = 256;
-        ScaleAffineTransformation affineTransformation = new ScaleAffineTransformation()
-                                                    .scaleFactor(5);
+        ShearAffineTransformation affineTransformation = new ShearAffineTransformation()
+                                                    .shear(0.02);
 
-        double[][] imageData = ImageHandler.load(new File("src/main/resources/8_000207.png"));
+        double[][] imageData = ImageHandler.load(new File("src/main/resources/6_000445.png"));
         double[][] flattenImageData = new double[][]{ImageHandler.flattenImage(imageData)};
         affineTransformation.setMatrixType(true);
         double[][] rotatedImageData = affineTransformation.transform(flattenImageData);
