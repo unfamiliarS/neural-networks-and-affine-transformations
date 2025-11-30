@@ -12,7 +12,7 @@ biases_layer0 = [0.9883695244789124, 16.352188110351562]
 
 scale_x = 5.0
 scale_y = 5.0
-rotation_angle = 180
+rotation_angle = 45
 
 transform_matrix_scale = np.array([
     [scale_x, 0],

@@ -14,7 +14,7 @@ import com.shavarushka.network.api.fabric.MultipleTriangleModelFabric;
 
 public class Main {
     public static void main(String[] args) {
-        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangles.zip"));
+        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangle.zip"));
 
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();

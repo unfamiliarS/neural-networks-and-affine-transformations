@@ -20,7 +20,7 @@ public class MultipleTriangleNetwork {
         MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                 .seed(modelSeed)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .updater(new Adam(0.1))
+                .updater(new Adam(0.09))
                 .l2(0.001)
                 .list()
                 .layer(new DenseLayer.Builder()
