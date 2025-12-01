@@ -20,15 +20,6 @@ public interface CLIOptions {
                 .build());
 
         options.addOption(Option.builder()
-                .longOpt("mtype")
-                .required(true)
-                .hasArg(true)
-                .argName("mtype")
-                .valueSeparator('=')
-                .desc("Type of neural network model you want to load")
-                .build());
-
-        options.addOption(Option.builder()
                 .longOpt("data")
                 .required(true)
                 .hasArg(true)
@@ -51,6 +42,14 @@ public interface CLIOptions {
                 .argName("scaleFactor")
                 .valueSeparator('=')
                 .desc("Affine scale transformation example data ('x,y' point and MNIST 28x28 image supported) and neural network weights")
+                .build());
+
+        options.addOption(Option.builder()
+                .longOpt("shear")
+                .hasArg(true)
+                .argName("shear")
+                .valueSeparator('=')
+                .desc("Affine shear transformation example data ('x,y' point and MNIST 28x28 image supported) and neural network weights")
                 .build());
 
         return options;

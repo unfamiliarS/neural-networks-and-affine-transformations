@@ -38,7 +38,7 @@ def transform_weights(weights, transformation, **kwargs):
     transformed_weights = []
     for neuron_weights in weights:
         weights_array = np.array(neuron_weights)
-        if transformation == 'rotation':
+        if transformation == 'rotate':
             angle_rad = np.radians(kwargs['angle'])
             rotation_matrix = np.array([
                 [np.cos(angle_rad), -np.sin(angle_rad)],
@@ -75,7 +75,7 @@ def main():
     parser.add_argument('--biases', type=str, required=True)
     parser.add_argument('--dataset', type=str, default='/home/semyon/projects/neural-networks-and-affine-transformations/src/main/python/multipletriangle/dataset.csv')
     parser.add_argument('--output', type=str, default='multiple-triangles-class.png')
-    parser.add_argument('--affineTransformation', type=str, choices=['rotation', 'scale', 'shear'])
+    parser.add_argument('--affineTransformation', type=str, choices=['rotate', 'scale', 'shear'])
     parser.add_argument('--angle', type=float, default=45)
     parser.add_argument('--scale', type=float, default=1.5)
     parser.add_argument('--shear', type=float, default=0.3)
@@ -112,9 +112,9 @@ def main():
     if args.affineTransformation:
         data_points = df[['x', 'y']].values
         
-        if args.affineTransformation == 'rotation':
+        if args.affineTransformation == 'rotate':
             transformed_data = apply_rotation(data_points, args.angle)
-            transformed_weights = transform_weights(weights_layer0, 'rotation', angle=args.angle)
+            transformed_weights = transform_weights(weights_layer0, 'rotate', angle=args.angle)
             ax2.set_title(f'Rotated Data (angle={args.angle}°)')
             
         elif args.affineTransformation == 'scale':

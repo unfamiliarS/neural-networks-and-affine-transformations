@@ -4,7 +4,8 @@ import java.util.Map;
 
 import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.MatrixUtils;
-import com.shavarushka.affine.RotationAffineTransformation;
+import com.shavarushka.affine.ScaleAffineTransformation;
+import com.shavarushka.affine.ShearAffineTransformation;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.Models;
 import com.shavarushka.network.api.NeuronActivationHandler;
@@ -12,26 +13,26 @@ import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.ModelFabric;
 import com.shavarushka.network.api.fabric.ModelFactoryOfFactory;
 
-public class RotationCommand implements Command {
+public class ShearCommand implements Command {
 
     private DataExtractionStrategy dataExtractor;
     private ModelFabric fabric;
 
-    private double angle;
+    private double shear;
 
     private Map<String,String> requiredArgs;
 
     private Command visualization;
 
-    public RotationCommand(Map<String,String> requiredArgs, String rotationAngle) {
-        this.angle = rotationAngle != null ? Double.parseDouble(rotationAngle) : 0;
+    public ShearCommand(Map<String,String> requiredArgs, String shear) {
+        this.shear = shear != null ? Double.parseDouble(shear) : 0;
         this.requiredArgs = requiredArgs;
-        visualization = new VisualizationCommand(requiredArgs, "rotate", rotationAngle);
+        visualization = new VisualizationCommand(requiredArgs, "shear", shear);
     }
 
     @Override
     public String name() {
-        return "rotate";
+        return "shear";
     }
 
     private void lazyInit() {
@@ -50,10 +51,11 @@ public class RotationCommand implements Command {
         NeuronActivationHandler neuronActivationHandler = fabric.createNeuronActivationHander();
         ModelPredictor predictor = fabric.createPredictor();
 
-        AffineTransformation affineTransformation = new RotationAffineTransformation()
-                                                            .angle(angle);
+        AffineTransformation affineTransformation = new ShearAffineTransformation()
+                                                        .shear(shear);
 
         double[][] data = new double[][]{dataExtractor.extract()};
+        ((ShearAffineTransformation) affineTransformation).setMatrixType(true);
         double[][] rotatedData = affineTransformation.transform(data);
 
         System.out.println();
@@ -62,7 +64,7 @@ public class RotationCommand implements Command {
         MatrixUtils.printMatrix(rotatedData);
 
         System.out.println();
-        System.out.println("Before weight rotation");
+        System.out.println("Before weight transformation");
         System.out.println();
         System.out.println("Original data");
         System.out.println("Neuron activations:");
@@ -70,7 +72,7 @@ public class RotationCommand implements Command {
         System.out.println();
         System.out.println(predictor.predict(data[0]));
         System.out.println();
-        System.out.println("Rotated data");
+        System.out.println("Transformed data");
         System.out.println("Neuron activations:");
         MatrixUtils.printMatrix(neuronActivationHandler.getAllLayerActivationsAsArrays(rotatedData[0]));
         System.out.println();
@@ -78,11 +80,12 @@ public class RotationCommand implements Command {
 
         int layerIndex = 0;
         double[][] origLayerWeights = weightsManager.getLayerWeights(layerIndex);
+        ((ShearAffineTransformation) affineTransformation).setMatrixType(false);
         double[][] rotatedWeights = affineTransformation.transform(origLayerWeights);
         weightsManager.setLayerWeights(layerIndex, rotatedWeights);
 
         System.out.println();
-        System.out.println("After weight rotation on " + angle);
+        System.out.println("After weight transformation");
         System.out.println();
         System.out.println("Original data");
         System.out.println("Neuron activations:");
@@ -90,7 +93,7 @@ public class RotationCommand implements Command {
         System.out.println();
         System.out.println(predictor.predict(data[0]));
         System.out.println();
-        System.out.println("Rotated data");
+        System.out.println("Transformed data");
         System.out.println("Neuron activations:");
         MatrixUtils.printMatrix(neuronActivationHandler.getAllLayerActivationsAsArrays(rotatedData[0]));
         System.out.println();

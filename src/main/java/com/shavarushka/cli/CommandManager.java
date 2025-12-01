@@ -10,6 +10,7 @@ import org.apache.commons.cli.Option;
 import com.shavarushka.cli.commands.Command;
 import com.shavarushka.cli.commands.RotationCommand;
 import com.shavarushka.cli.commands.ScaleCommand;
+import com.shavarushka.cli.commands.ShearCommand;
 
 public class CommandManager {
 
@@ -23,6 +24,7 @@ public class CommandManager {
 
         register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));
         register(new ScaleCommand(requiredArgs, parsedCommands.getOptionValue("scale")));
+        register(new ShearCommand(requiredArgs, parsedCommands.getOptionValue("shear")));
     }
 
     private void register(Command command) {

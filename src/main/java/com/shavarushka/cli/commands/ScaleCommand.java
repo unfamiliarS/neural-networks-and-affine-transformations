@@ -5,8 +5,8 @@ import java.util.Map;
 import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.MatrixUtils;
 import com.shavarushka.affine.ScaleAffineTransformation;
-import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
+import com.shavarushka.network.api.Models;
 import com.shavarushka.network.api.NeuronActivationHandler;
 import com.shavarushka.network.api.WeightsManager;
 import com.shavarushka.network.api.fabric.ModelFabric;
@@ -21,9 +21,12 @@ public class ScaleCommand implements Command {
 
     private Map<String,String> requiredArgs;
 
+    private Command visualization;
+
     public ScaleCommand(Map<String,String> requiredArgs, String scaleFactor) {
         this.scaleFactor = scaleFactor != null ? Double.parseDouble(scaleFactor) : 0;
         this.requiredArgs = requiredArgs;
+        visualization = new VisualizationCommand(requiredArgs, "scale", scaleFactor);
     }
 
     @Override
@@ -32,14 +35,11 @@ public class ScaleCommand implements Command {
     }
 
     private void lazyInit() {
-        dataExtractor = requiredArgs.get("mtype").equals("mnist") ?
+        dataExtractor = requiredArgs.get("model").endsWith("mnist") ?
                             new ImageDataExtraction(requiredArgs.get("data")) :
                             new PointDataExtraction(requiredArgs.get("data"));
 
-        fabric = ModelFactoryOfFactory.createFabric(
-            requiredArgs.get("mtype"),
-            ModelLoader.load(requiredArgs.get("model"))
-        );
+        fabric = ModelFactoryOfFactory.createFabric(requiredArgs.get("model"));
     }
 
     @Override
@@ -97,5 +97,10 @@ public class ScaleCommand implements Command {
         MatrixUtils.printMatrix(neuronActivationHandler.getAllLayerActivationsAsArrays(rotatedData[0]));
         System.out.println();
         System.out.println(predictor.predict(rotatedData[0]));
+
+        weightsManager.setLayerWeights(layerIndex, origLayerWeights);
+
+        if (Models.get(requiredArgs.get("model")).isVisualizable())
+            visualization.execute();
     }
 }
