@@ -29,7 +29,7 @@ def apply_scale(data, scale_x, scale_y):
 def apply_shear(data, shear_x, shear_y):
     shear_matrix = np.array([
         [1, shear_x],
-        [shear_y, 1]
+        [shear_x, 1]
     ])
     result = shear_matrix @ data.T
     return result.T
@@ -52,11 +52,18 @@ def transform_weights(weights, transformation, **kwargs):
             ])
             transformed = weights_array @ scale_matrix
         elif transformation == 'shear':
-            shear_matrix = np.array([
-                [1, -kwargs['shear_x']],
-                [-kwargs['shear_y'], 1]
-            ])
-            transformed = weights_array @ shear_matrix
+            shear_x = kwargs['shear_x']
+            shear_y = kwargs['shear_y']
+            det = 1 - shear_x * shear_y
+            
+            if abs(det) > 1e-6:
+                shear_matrix_inv = np.array([
+                    [1, -shear_x],
+                    [-shear_y, 1]
+                ]) / det
+                transformed = weights_array @ shear_matrix_inv
+            else:
+                transformed = weights_array
         transformed_weights.append(transformed.tolist())
     return transformed_weights
 

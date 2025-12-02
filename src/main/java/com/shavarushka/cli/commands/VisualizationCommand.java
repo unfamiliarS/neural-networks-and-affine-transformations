@@ -45,7 +45,7 @@ class VisualizationCommand implements Command {
         try {
             String weightsStr = convertWeightsToString(layerWeights);
             String biasesStr = convertBiasesToString(layerBiases);
-            String datasetPath = extractDataSetPath();
+            String datasetPath = Models.get(requiredArgs.get("model")).getDatasetPath();
 
             ProcessBuilder pb = buildPythonCommand(datasetPath, weightsStr, biasesStr);
             
@@ -59,10 +59,6 @@ class VisualizationCommand implements Command {
             System.err.println("Error executing visualization command: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    private String extractDataSetPath() {
-        return Models.valueOf(requiredArgs.get("model").toUpperCase().replace("-", "_")).getDatasetPath();
     }
 
     private String convertWeightsToString(double[][] weights) {

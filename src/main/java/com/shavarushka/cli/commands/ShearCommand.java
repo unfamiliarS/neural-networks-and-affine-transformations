@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.MatrixUtils;
-import com.shavarushka.affine.ScaleAffineTransformation;
 import com.shavarushka.affine.ShearAffineTransformation;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.Models;
