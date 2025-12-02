@@ -163,7 +163,7 @@ public class MNISTExperiment {
         
         MNISTExperiment experiment = new MNISTExperiment(predictor);
 
-        MnistDataSet data = loadRandomMnistImages("src/main/resources/test", 100);
+        MnistDataSet data = loadRandomMnistImages("/home/semyon/test", 100);
         
         double[] rotationAngles = {0.2};
 
