@@ -10,8 +10,7 @@ import com.shavarushka.cli.validators.exceptions.OptionValidationException;
 public class Main {
     public static void main(String[] args) {
         try {
-            // String[] argss = new String[]{"--rotate=256", "--model=src/main/resources/mnist-model.zip", "--mtype=mnist", "--data=src/main/resources/mnist-nums/8_005839.png"};
-            String[] argss = new String[]{"--shear=0.55", "--model=two-triangles", "--data=3.0,3.0"};
+            String[] argss = new String[]{"--shear=0.25", "--model=two-triangles", "--data=3.0,3.0"};
 
             CommandLine parsedArgs = parseEnteredArgs(argss);
 

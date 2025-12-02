@@ -32,7 +32,7 @@ public class ShearAffineTransformation extends AffineTransformation {
     protected double[][] createAffineMatrix(int dimensions) {
         double[][] result = createIdentityMatrix(dimensions);
 
-        for (int i = 0; i < dimensions-1; i++) {
+        for (int i = 0; i < dimensions-1; i +=4) {
             double[][] rotationMatrix = createSimpleAffineMatrix(dimensions, i, i+1);
             result = MatrixUtils.multiplyMatrices(result, rotationMatrix);
         }

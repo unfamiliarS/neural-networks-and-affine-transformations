@@ -67,7 +67,7 @@ class VisualizationCommand implements Command {
         for (int i = 0; i < weights.length; i++) {
             sb.append("[");
             for (int j = 0; j < weights[i].length; j++) {
-                sb.append(String.format("%.6f", weights[i][j]));
+                sb.append(String.format("%f", weights[i][j]));
                 if (j < weights[i].length - 1) {
                     sb.append(",");
                 }
@@ -85,7 +85,7 @@ class VisualizationCommand implements Command {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (int i = 0; i < biases.length; i++) {
-            sb.append(String.format("%.6f", biases[i]));
+            sb.append(String.format("%f", biases[i]));
             if (i < biases.length - 1) {
                 sb.append(",");
             }
@@ -95,8 +95,8 @@ class VisualizationCommand implements Command {
     }
 
     private ProcessBuilder buildPythonCommand(String datasetPath, String weights, String biases) {
-        String pythonScriptPath = "/home/semyon/projects/neural-networks-and-affine-transformations/src/main/python/visualization.py";
-        
+        String pythonScriptPath = System.getenv("HOME") + "/.local/affine/visualization.py";
+
         ProcessBuilder pb = new ProcessBuilder(
             "python", pythonScriptPath,
             "--dataset", datasetPath,
@@ -104,7 +104,7 @@ class VisualizationCommand implements Command {
             "--biases", biases,
             "--affineTransformation", transformationType
         );
-        
+
         switch (transformationType.toLowerCase()) {
             case "rotate":
                 if (angle != null) {

@@ -1,19 +1,19 @@
 package com.shavarushka.network.api;
 
 public enum Models {
-    MNIST("src/main/resources/mnist-model.zip", "", false),
-    SIMPLE_MNIST("src/main/resources/simple-mnist.zip", "", false),
-    TRIANGLE("src/main/resources/triangle-classifier.zip", "src/main/python/triangle/dataset.csv", true),
-    TWO_TRIANGLES("src/main/resources/two-triangle.zip", "src/main/python/multipletriangle/dataset.csv", true);
+    MNIST(System.getenv("HOME") + "/.local/affine/mnist/mnist-model.zip", "", false),
+    SIMPLE_MNIST(System.getenv("HOME") + "/.local/affine/simple-mnist/simple-mnist.zip", "", false),
+    TRIANGLE(System.getenv("HOME") + "/.local/affine/triangle/triangle-classifier.zip", System.getenv("HOME") + "/.local/affine/triangle/dataset.csv", true),
+    TWO_TRIANGLES(System.getenv("HOME") + "/.local/affine/two-triangles/two-triangle.zip", System.getenv("HOME") + "/.local/affine/two-triangles/dataset.csv", true);
 
     private String modelPath;
     private String datasetPath;
     private boolean isVisualizable;
-    
+
     public String getModelPath() {
         return modelPath;
     }
-    
+
     public String getDatasetPath() {
         return datasetPath;
     }

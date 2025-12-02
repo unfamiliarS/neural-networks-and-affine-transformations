@@ -14,7 +14,7 @@ import com.shavarushka.network.api.fabric.ModelFabric;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/simple-mnist.zip"));
+        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/simple-mnist/simple-mnist.zip"));
 
         WeightsManager weightsManager = fabric.createWeightsManager();
         NeuronActivationHandler neuronActivationHandler = fabric.createNeuronActivationHander();

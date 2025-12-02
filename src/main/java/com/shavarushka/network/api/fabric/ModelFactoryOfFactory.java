@@ -19,7 +19,7 @@ public class ModelFactoryOfFactory {
                         default -> throw new IllegalArgumentException(
                             String.format("Unknown model type: '%s'. Supported types: %s",
                                 fabricType,
-                                "mnist, triangle, two-triangles")
+                                "simple-mnist, mnist, triangle, two-triangles")
                         );
                     };
                 }

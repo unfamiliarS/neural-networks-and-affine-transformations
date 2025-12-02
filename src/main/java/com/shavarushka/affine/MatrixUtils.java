@@ -34,7 +34,7 @@ public class MatrixUtils {
             for (double value : row) {
                 System.out.print(value + " ");
             }
-            System.out.println();
+            System.out.println("\n");
         }
     }
 }

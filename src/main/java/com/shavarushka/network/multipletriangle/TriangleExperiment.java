@@ -2,6 +2,7 @@ package com.shavarushka.network.multipletriangle;
 
 import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.RotationAffineTransformation;
+import com.shavarushka.affine.ShearAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.PredictionResult;
@@ -36,11 +37,13 @@ public class TriangleExperiment {
                          "before_data_and_after_weigths_transformation_prediction_match,before_data_and_after_weigths_transformation_confidence_change," +
                          "after_data_and_weigths_transformation_prediction_match,after_data_and_weigths_transformation_confidence_change");
 
-            AffineTransformation affineTransformation = new RotationAffineTransformation().angle(rotationDegrees);
+            AffineTransformation affineTransformation = new ShearAffineTransformation().shear(rotationDegrees);
 
             double[][] originalWeights = weightsManager.getLayerWeights(0);
+            ((ShearAffineTransformation) affineTransformation).setMatrixType(false);
             double[][] rotatedWeights = affineTransformation.transform(originalWeights);
             
+            ((ShearAffineTransformation) affineTransformation).setMatrixType(true);
             double[][] rotatedDataSet = affineTransformation.transform(dataset);
 
             for (int i = 0; i < dataset.length; i++) {
@@ -156,18 +159,18 @@ public class TriangleExperiment {
         }
     }
     public static void main(String[] args) {
-        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangles.zip"));
+        ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangles/two-triangle.zip"));
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
         
         TriangleExperiment experiment = new TriangleExperiment(predictor);
         
-        DatasetWithLabels data = loadDatasetWithLabels("src/main/python/multipletriangle/dataset.csv");
+        DatasetWithLabels data = loadDatasetWithLabels("src/main/resources/two-triangles/dataset.csv");
         
-        double[] rotationAngles = {256.52};
+        double[] rotationAngles = {0.2};
 
         for (double angle : rotationAngles) {
-            String outputPath = String.format("two_triangle_experiment_rotate_%.0fdeg.csv", angle);
+            String outputPath = String.format("two_triangle_experiment_shear.csv");
             experiment.runExperiments(weightsManager, data.points, data.labels, angle, outputPath);   
         }
     }

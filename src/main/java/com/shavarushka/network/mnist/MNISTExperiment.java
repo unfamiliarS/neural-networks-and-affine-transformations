@@ -1,6 +1,8 @@
 package com.shavarushka.network.mnist;
 
+import com.shavarushka.affine.AffineTransformation;
 import com.shavarushka.affine.ScaleAffineTransformation;
+import com.shavarushka.affine.ShearAffineTransformation;
 import com.shavarushka.network.api.ModelLoader;
 import com.shavarushka.network.api.ModelPredictor;
 import com.shavarushka.network.api.PredictionResult;
@@ -37,8 +39,8 @@ public class MNISTExperiment {
                          "before_data_and_after_weigths_rotation_prediction_match,before_data_and_after_weigths_rotation_confidence_change," +
                          "after_data_and_weigths_rotation_prediction_match,after_data_and_weigths_rotation_confidence_change");
 
-            ScaleAffineTransformation affineTransformation = new ScaleAffineTransformation()
-                                                            .scaleFactor(5);
+            ShearAffineTransformation affineTransformation = new ShearAffineTransformation()
+                                                            .shear(rotationDegrees);
             
             double[][] originalWeights = weightsManager.getLayerWeights(0);
             affineTransformation.setMatrixType(false);
@@ -155,7 +157,7 @@ public class MNISTExperiment {
     }
 
     public static void main(String[] args) {
-        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/mnist-model.zip"));
+        ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/mnist/mnist-model.zip"));
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
         
@@ -163,10 +165,10 @@ public class MNISTExperiment {
 
         MnistDataSet data = loadRandomMnistImages("src/main/resources/test", 100);
         
-        double[] rotationAngles = {256.52};
+        double[] rotationAngles = {0.2};
 
         for (double angle : rotationAngles) {
-            String outputPath = String.format("mnist_scale_experiment_%.0fdeg.csv", angle);
+            String outputPath = String.format("mnist_shear_experiment.csv");
             experiment.runExperiments(weightsManager, data.flattenImages, data.numbers, angle, outputPath);   
         }
     }
