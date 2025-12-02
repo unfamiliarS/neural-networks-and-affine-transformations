@@ -37,32 +37,6 @@ public class ShearAffineTransformation extends AffineTransformation {
             result = MatrixUtils.multiplyMatrices(result, rotationMatrix);
         }
 
-        // for (int i = 0; i < dimensions; i++) {
-        //     for (int j = 0; j < dimensions; j++) {
-        //         if (i != j) {
-        //             double[][] rotationMatrix = createSimpleAffineMatrix(dimensions, i, j);
-        //             result = MatrixUtils.multiplyMatrices(result, rotationMatrix);
-        //         }
-        //     }
-        // }
-
-        // for (int i = 0; i < dimensions; i++) {
-        //     for (int j = i+1; j < dimensions; j += 5) {
-        //         double[][] rotationMatrix = createSimpleAffineMatrix(dimensions, i, j);
-        //         result = MatrixUtils.multiplyMatrices(result, rotationMatrix);
-        //     }
-        // }
-
-        // double[][] rotationMatrix;
-        // for (int i = 0; i < dimensions; i++) {
-        //     if (i == 0)
-        //         rotationMatrix = createSimpleAffineMatrix(dimensions, i, i+1);
-        //     else
-        //         rotationMatrix = createSimpleAffineMatrix(dimensions, i, 0);
-
-        //     result = MatrixUtils.multiplyMatrices(result, rotationMatrix);
-        // }
-
         return result;
     }
 
