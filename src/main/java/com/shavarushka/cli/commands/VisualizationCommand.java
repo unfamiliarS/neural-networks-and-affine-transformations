@@ -1,5 +1,7 @@
 package com.shavarushka.cli.commands;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 import com.shavarushka.network.api.Models;
@@ -51,10 +53,26 @@ class VisualizationCommand implements Command {
             
             Process process = pb.start();
             
-            int exitCode = process.waitFor();
-            if (exitCode != 0)
-                System.err.println("Python script exited with error code: " + exitCode);
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             
+            StringBuilder errorOutput = new StringBuilder();
+            
+            String line;
+            while ((line = errorReader.readLine()) != null)
+                errorOutput.append(line).append("\n");
+            
+            int exitCode = process.waitFor();
+            
+            if (errorOutput.length() > 0) {
+                System.err.println("Python script errors:");
+                System.err.println(errorOutput.toString());
+            }
+            
+            if (exitCode != 0)
+                System.err.println("Python script exited with error code: " + exitCode);    
+            
+            errorReader.close();
+
         } catch (Exception e) {
             System.err.println("Error executing visualization command: " + e.getMessage());
             e.printStackTrace();

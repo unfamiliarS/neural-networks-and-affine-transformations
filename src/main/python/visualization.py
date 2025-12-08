@@ -41,22 +41,16 @@ def transform_weights(weights, transformation, **kwargs):
         
         if transformation == 'rotate':
             angle = kwargs['angle']
-            # Для линии w1*x + w2*y + b = 0
-            # При вращении данных на угол θ, линия вращается на -θ
-            # Это эквивалентно вращению нормального вектора (w1, w2) на θ
             angle_rad = np.radians(angle)
             rotation_matrix = np.array([
                 [np.cos(angle_rad), -np.sin(angle_rad)],
                 [np.sin(angle_rad), np.cos(angle_rad)]
             ])
-            # Вращаем нормальный вектор
             transformed = rotation_matrix @ weights_array
             
         elif transformation == 'scale':
             scale_x = kwargs['scale_x']
             scale_y = kwargs['scale_y']
-            # При масштабировании данных на (sx, sy)
-            # Линия преобразуется как w1/sx * x + w2/sy * y + b = 0
             scale_matrix = np.array([
                 [1/scale_x, 0],
                 [0, 1/scale_y]
@@ -66,12 +60,9 @@ def transform_weights(weights, transformation, **kwargs):
         elif transformation == 'shear':
             shear_x = kwargs['shear_x']
             shear_y = kwargs['shear_y']
-            # Для сдвига: матрица преобразования [1, hx; hy, 1]
-            # Обратное преобразование весов
             det = 1 - shear_x * shear_y
             
             if abs(det) > 1e-6:
-                # Матрица обратного преобразования
                 inv_matrix = np.array([
                     [1, -shear_y],
                     [-shear_x, 1]
@@ -91,8 +82,7 @@ def safe_limits(data):
         return -1, 1
     data_min = np.min(clean_data)
     data_max = np.max(clean_data)
-    padding = (data_max - data_min) * 0.1
-    return data_min - padding, data_max + padding
+    return data_min, data_max
 
 def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, color='green', alpha=0.8, linewidth=2):
     x_min, x_max = x_lim
@@ -151,7 +141,7 @@ def main():
 
     x_min, x_max = safe_limits(df['x'].values)
     y_min, y_max = safe_limits(df['y'].values)
-    
+
     ax1.set_xlim(x_min, x_max)
     ax1.set_ylim(y_min, y_max)
 
