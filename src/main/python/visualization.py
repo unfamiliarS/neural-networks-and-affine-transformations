@@ -113,14 +113,13 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, color='green', alp
 
             norm_length = np.sqrt(w1**2 + w2**2)
             if norm_length > 0:
-                scale = 0.5
+                scale = 0.4
                 dx = w1 / norm_length * scale
                 dy = w2 / norm_length * scale
-
                 ax.arrow(x_mid, y_mid, dx, dy, 
                         head_width=0.1, head_length=0.1, 
                         fc='green', ec='green', 
-                        alpha=0.7, width=0.02)
+                        alpha=0.7, width=0.05)
                          
 def main():
     parser = argparse.ArgumentParser()
