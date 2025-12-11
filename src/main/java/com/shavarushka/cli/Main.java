@@ -11,7 +11,10 @@ public class Main {
     public static void main(String[] args) {
         try {
 
-            CommandLine parsedArgs = parseEnteredArgs(args);
+            String[] argss = new String[]{"--shear=0.2", "--model=two-triangles", "--data=3.0,3.0"};
+
+            CommandLine parsedArgs = parseEnteredArgs(argss);
+            // CommandLine parsedArgs = parseEnteredArgs(args);
 
             validateArgs(parsedArgs);
 
