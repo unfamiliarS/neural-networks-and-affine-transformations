@@ -87,26 +87,41 @@ def safe_limits(data):
 def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, color='green', alpha=0.8, linewidth=2):
     x_min, x_max = x_lim
     y_min, y_max = y_lim
-    
+
+    x_padding = (x_max - x_min) * 0.5
+    x_range_ext = np.linspace(x_min - x_padding, x_max + x_padding, 400)
     x_range = np.linspace(x_min, x_max, 400)
-    
+
     for neuron_idx in range(len(weights)):
         w1 = weights[neuron_idx][0]
         w2 = weights[neuron_idx][1]
         b = biases[neuron_idx]
-        
-        if abs(w2) > 1e-6:
-            y_line = (-w1 * x_range - b) / w2
-            valid_indices = (y_line >= y_min) & (y_line <= y_max)
-            if np.any(valid_indices):
-                ax.plot(x_range[valid_indices], y_line[valid_indices], 
-                       color=color, linewidth=linewidth, alpha=alpha)
-        else:
-            if abs(w1) > 1e-6:
-                x_val = -b / w1
-                if x_min <= x_val <= x_max:
-                    ax.axvline(x=x_val, color=color, linewidth=linewidth, alpha=alpha)
 
+        y_line_ext = (-w1 * x_range_ext - b) / w2
+        y_line = (-w1 * x_range - b) / w2
+        ax.plot(x_range_ext, y_line_ext, 
+                color=color, linewidth=linewidth, alpha=alpha)
+
+        valid_indices = (y_line >= y_min) & (y_line <= y_max)
+        if np.any(valid_indices):
+            x_vals = x_range[valid_indices]
+            y_vals = y_line[valid_indices]
+
+            idx_mid = len(x_vals) // 2
+            x_mid = x_vals[idx_mid]
+            y_mid = y_vals[idx_mid]
+
+            norm_length = np.sqrt(w1**2 + w2**2)
+            if norm_length > 0:
+                scale = 0.5
+                dx = w1 / norm_length * scale
+                dy = w2 / norm_length * scale
+
+                ax.arrow(x_mid, y_mid, dx, dy, 
+                        head_width=0.1, head_length=0.1, 
+                        fc='green', ec='green', 
+                        alpha=0.7, width=0.02)
+                         
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, required=True)
