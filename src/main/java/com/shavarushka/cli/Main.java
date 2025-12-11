@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         try {
 
-            String[] argss = new String[]{"--rotate=35", "--model=two-triangles", "--data=3.0,3.0"};
+            String[] argss = new String[]{"--shear=0.5", "--model=two-triangles", "--data=3.0,3.0"};
 
             CommandLine parsedArgs = parseEnteredArgs(argss);
             // CommandLine parsedArgs = parseEnteredArgs(args);
