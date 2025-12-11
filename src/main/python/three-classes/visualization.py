@@ -13,7 +13,6 @@ df['label'] = pd.to_numeric(df['label'], errors='coerce')
 
 plt.figure(figsize=(12, 8))
 
-# 1. Отображение точек датасета
 colors = ['red' if label == 0 else 'blue' if label == 1 else 'green' for label in df['label']]
 plt.scatter(df['x1'], df['x2'], c=colors, alpha=0.7, s=30,
            edgecolors='black', linewidth=0.5)
@@ -29,7 +28,6 @@ plt.ylabel('x2')
 plt.title('Датасет и линии принятия решений нейронной сети')
 plt.grid(True, alpha=0.3)
 
-# 2. Построение линий принятия решений для каждого нейрона
 x1_range = np.linspace(df['x1'].min() - 0.5, df['x1'].max() + 0.5, 100)
 
 for neuron_idx in range(2):
@@ -37,8 +35,6 @@ for neuron_idx in range(2):
     w2 = weights[1][neuron_idx]
     b = biases[neuron_idx]
 
-    # Уравнение линии: w1*x1 + w2*x2 + b = 0
-    # Выражаем x2 через x1: x2 = (-w1*x1 - b) / w2
     if w2 != 0:
         x2_line = (-w1 * x1_range - b) / w2
 
