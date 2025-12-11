@@ -71,7 +71,7 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, alpha=0.8, linewid
         b = biases[neuron_idx]
 
         line_color = colors[neuron_idx % len(colors)]
-        label = f'Линия нейрона {neuron_idx}: w=[{w1:.3f}, {w2:.3f}], b={b:.3f}'
+        label = f'Neuron line {neuron_idx}: w=[{w1:.3f}, {w2:.3f}], b={b:.3f}'
 
         y_line_ext = (-w1 * x_range_ext - b) / w2
         y_line = (-w1 * x_range - b) / w2

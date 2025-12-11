@@ -10,6 +10,11 @@ public interface CLIOptions {
     private static Options createOptions() {
         Options options = new Options();
 
+        options.addOption(Option.builder("h")
+                .longOpt("help")
+                .desc("Show this help message")
+                .build());
+
         options.addOption(Option.builder()
                 .longOpt("model")
                 .required(true)

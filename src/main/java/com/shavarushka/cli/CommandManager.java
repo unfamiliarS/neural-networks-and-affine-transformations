@@ -8,6 +8,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
 import com.shavarushka.cli.commands.Command;
+import com.shavarushka.cli.commands.HelpCommand;
 import com.shavarushka.cli.commands.RotationCommand;
 import com.shavarushka.cli.commands.ScaleCommand;
 import com.shavarushka.cli.commands.ShearCommand;
@@ -22,6 +23,7 @@ public class CommandManager {
         parsedCommands = cmd;
         requiredArgs = new RequiredArgsParser().parse();
 
+        register(new HelpCommand());
         register(new RotationCommand(requiredArgs, parsedCommands.getOptionValue("rotate")));
         register(new ScaleCommand(requiredArgs, parsedCommands.getOptionValue("scale")));
         register(new ShearCommand(requiredArgs, parsedCommands.getOptionValue("shear")));
@@ -32,6 +34,11 @@ public class CommandManager {
     }
 
     public void process() {
+        if (parsedCommands.hasOption("help")) {
+            commands.get("help").execute();
+            return;
+        }
+
         for (Map.Entry<String, Command> entry : commands.entrySet())
             if (commandShouldExecute(entry))
                 entry.getValue().execute();
