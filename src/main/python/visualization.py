@@ -55,7 +55,7 @@ def safe_limits(data):
     data_max = np.max(clean_data)
     return data_min, data_max
 
-def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, color='green', alpha=0.8, linewidth=2):
+def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, alpha=0.8, linewidth=2):
     x_min, x_max = x_lim
     y_min, y_max = y_lim
 
@@ -63,15 +63,20 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, color='green', alp
     x_range_ext = np.linspace(x_min - x_padding, x_max + x_padding, 400)
     x_range = np.linspace(x_min, x_max, 400)
 
+    colors = ['red', 'blue', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'magenta']
+    
     for neuron_idx in range(len(weights)):
         w1 = weights[neuron_idx][0]
         w2 = weights[neuron_idx][1]
         b = biases[neuron_idx]
 
+        line_color = colors[neuron_idx % len(colors)]
+        label = f'Линия нейрона {neuron_idx}: w=[{w1:.3f}, {w2:.3f}], b={b:.3f}'
+
         y_line_ext = (-w1 * x_range_ext - b) / w2
         y_line = (-w1 * x_range - b) / w2
         ax.plot(x_range_ext, y_line_ext, 
-                color=color, linewidth=linewidth, alpha=alpha)
+                color=line_color, linewidth=linewidth, alpha=alpha, label=label)
 
         valid_indices = (y_line >= y_min) & (y_line <= y_max)
         if np.any(valid_indices):
@@ -91,7 +96,10 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, color='green', alp
                         head_width=0.1, head_length=0.1, 
                         fc='green', ec='green', 
                         alpha=0.7, width=0.05)
-                         
+
+    if len(weights) > 0:
+        ax.legend(loc='best', fontsize=10)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, required=True)
@@ -116,7 +124,6 @@ def main():
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
     colors = ['blue' if cls == 0 else 'red' for cls in df['class']]
 
-    # Original data
     ax1.scatter(df['x'], df['y'], c=colors, alpha=0.7, s=30, edgecolors='black', linewidth=0.5)
     ax1.set_title('Original Data')
     ax1.set_xlabel('X')
@@ -130,9 +137,8 @@ def main():
     ax1.set_xlim(x_min, x_max)
     ax1.set_ylim(y_min, y_max)
 
-    plot_decision_boundary(ax1, weights_layer0, biases_layer0, (x_min, x_max), (y_min, y_max), color='purple')
+    plot_decision_boundary(ax1, weights_layer0, biases_layer0, (x_min, x_max), (y_min, y_max))
 
-    # Transformed data
     ax2.set_xlabel('X')
     ax2.set_ylabel('Y')
     ax2.grid(True, alpha=0.3)
@@ -163,8 +169,7 @@ def main():
     ax2.set_xlim(x_min_t, x_max_t)
     ax2.set_ylim(y_min_t, y_max_t)
     
-    plot_decision_boundary(ax2, transformed_weights, biases_layer0, 
-                            (x_min_t, x_max_t), (y_min_t, y_max_t), color='purple')
+    plot_decision_boundary(ax2, transformed_weights, biases_layer0, (x_min_t, x_max_t), (y_min_t, y_max_t))
 
     plt.tight_layout()
     plt.show()
