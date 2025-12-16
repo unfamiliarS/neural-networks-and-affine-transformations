@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -jar $HOME/projects/neural-networks-and-affine-transformations/target/neural-networks-and-affine-transformations-1.0-SNAPSHOT-custom-jar-with-deps.jar $@
+java -jar $HOME/programs/neural-networks-and-affine-transformations/target/neural-networks-and-affine-transformations-1.0-SNAPSHOT-custom-jar-with-deps.jar $@
