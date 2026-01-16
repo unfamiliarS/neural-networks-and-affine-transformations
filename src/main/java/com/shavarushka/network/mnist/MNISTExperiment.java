@@ -41,11 +41,11 @@ public class MNISTExperiment {
 
             ShearAffineTransformation affineTransformation = new ShearAffineTransformation()
                                                             .shear(rotationDegrees);
-            
+
             double[][] originalWeights = weightsManager.getLayerWeights(0);
             affineTransformation.setMatrixType(false);
             double[][] rotatedWeights = affineTransformation.transform(originalWeights);
-            
+
             affineTransformation.setMatrixType(true);
             double[][] rotatedDataSet = affineTransformation.transform(dataset);
 
@@ -53,12 +53,12 @@ public class MNISTExperiment {
                 double[] originalData = dataset[i];
                 double[] rotatedData = rotatedDataSet[i];
                 int imageData = trueLabels[i];
-                
+
                 // Исходные точка и веса
                 PredictionResult beforeAllRotation = predictor.predict(originalData);
                 // Повёрнутая точка и исходные веса
                 PredictionResult afterDataBeforeWeigthRotation = predictor.predict(rotatedData);
-                
+
                 weightsManager.setLayerWeights(0, rotatedWeights);
 
                 // Повёрнутые точка и веса
@@ -67,17 +67,17 @@ public class MNISTExperiment {
                 PredictionResult beforeDataAfterWeigthRotation = predictor.predict(originalData);
 
                 weightsManager.setLayerWeights(0, originalWeights);
-                
+
                 String record = createExperimentRecord(
                     i, imageData, beforeAllRotation, afterAllRotation,
                     afterDataBeforeWeigthRotation, beforeDataAfterWeigthRotation
                 );
 
                 writer.println(record);
-                
+
                 System.out.println("Выполнено экспериментов: " + i + "/" + dataset.length);
             }
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,7 +121,7 @@ public class MNISTExperiment {
 
         for (int digit = 0; digit <= 9; digit++) {
             List<String> digitFiles = getImageFilesForDigit(mnistPath, digit);
-            
+
             Collections.shuffle(digitFiles, random);
             int count = Math.min(imagesPerDigit, digitFiles.size());
 
@@ -137,10 +137,10 @@ public class MNISTExperiment {
 
     private static List<String> getImageFilesForDigit(String mnistPath, int digit) {
         File digitDir = new File(mnistPath);
-        File[] files = digitDir.listFiles((dir, name) -> 
+        File[] files = digitDir.listFiles((dir, name) ->
             name.startsWith(digit + "_") && name.endsWith(".png")
         );
-        
+
         return Arrays.stream(files)
                 .map(File::getAbsolutePath)
                 .collect(Collectors.toList());
@@ -149,7 +149,7 @@ public class MNISTExperiment {
     public static class MnistDataSet {
         public double[][] flattenImages;
         public int[] numbers;
-        
+
         public MnistDataSet(double[][] flattenImages, int[] numbers) {
             this.flattenImages = flattenImages;
             this.numbers = numbers;
@@ -160,16 +160,16 @@ public class MNISTExperiment {
         ModelFabric fabric = new MNISTModelFabric(ModelLoader.load("src/main/resources/mnist/mnist-model.zip"));
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
-        
+
         MNISTExperiment experiment = new MNISTExperiment(predictor);
 
         MnistDataSet data = loadRandomMnistImages("/home/semyon/test", 100);
-        
+
         double[] rotationAngles = {0.2};
 
         for (double angle : rotationAngles) {
             String outputPath = String.format("mnist_shear_experiment.csv");
-            experiment.runExperiments(weightsManager, data.flattenImages, data.numbers, angle, outputPath);   
+            experiment.runExperiments(weightsManager, data.flattenImages, data.numbers, angle, outputPath);
         }
     }
 }

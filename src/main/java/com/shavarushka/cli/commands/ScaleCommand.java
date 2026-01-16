@@ -52,7 +52,7 @@ public class ScaleCommand implements Command {
 
         AffineTransformation affineTransformation = new ScaleAffineTransformation()
                                                         .scaleFactor(scaleFactor);
-                                                        
+
         double[] data = dataExtractor.extract();
         double[][] origLayerWeights = weightsManager.getLayerWeights(0);
 
@@ -68,7 +68,7 @@ public class ScaleCommand implements Command {
         System.out.println("-".repeat(30) + "Prediction:" + "-".repeat(30));
         System.out.println(predictor.predict(data));
         System.out.println("\n");
-        
+
         ((ScaleAffineTransformation) affineTransformation).setMatrixType(true);
         double[] rotatedData = affineTransformation.transform(new double[][]{data})[0];
         ((ScaleAffineTransformation) affineTransformation).setMatrixType(false);
@@ -97,9 +97,9 @@ public class ScaleCommand implements Command {
         if (matrix == null || matrix.length == 0 || matrix[0] == null) {
             return "";
         }
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         int rowsToShow = Math.min(count, matrix.length);
         for (int i = 0; i < rowsToShow; i++) {
             int colsToShow = Math.min(count, matrix[i].length);
@@ -109,20 +109,20 @@ public class ScaleCommand implements Command {
                     sb.append(" ");
                 }
             }
-            
+
             if (matrix[i].length > colsToShow) {
                 sb.append(" ...");
             }
-            
+
             if (i < rowsToShow - 1) {
                 sb.append("\n");
             }
         }
-        
+
         if (matrix.length > rowsToShow) {
             sb.append("\n...");
         }
-        
+
         return sb.toString();
     }
 }

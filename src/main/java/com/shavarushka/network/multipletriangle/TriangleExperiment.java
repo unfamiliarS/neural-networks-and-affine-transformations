@@ -42,7 +42,7 @@ public class TriangleExperiment {
             double[][] originalWeights = weightsManager.getLayerWeights(0);
             ((ShearAffineTransformation) affineTransformation).setMatrixType(false);
             double[][] rotatedWeights = affineTransformation.transform(originalWeights);
-            
+
             ((ShearAffineTransformation) affineTransformation).setMatrixType(true);
             double[][] rotatedDataSet = affineTransformation.transform(dataset);
 
@@ -50,12 +50,12 @@ public class TriangleExperiment {
                 double[] originalPoint = dataset[i];
                 double[] rotatedPoint = rotatedDataSet[i];
                 byte trueLabel = trueLabels[i];
-                
+
                 // Исходные точка и веса
                 PredictionResult beforeAllTransformation = predictor.predict(originalPoint);
                 // Повёрнутая точка и исходные веса
                 PredictionResult afterDataBeforeWeigthTransformation = predictor.predict(rotatedPoint);
-                
+
                 weightsManager.setLayerWeights(0, rotatedWeights);
 
                 // Повёрнутые точка и веса
@@ -64,19 +64,19 @@ public class TriangleExperiment {
                 PredictionResult beforeDataAfterWeigthTransformation = predictor.predict(originalPoint);
 
                 weightsManager.setLayerWeights(0, originalWeights);
-                
+
                 String record = createExperimentRecord(
                     i, originalPoint, trueLabel, beforeAllTransformation, afterAllTransformation,
                     afterDataBeforeWeigthTransformation, beforeDataAfterWeigthTransformation
                 );
 
                 writer.println(record);
-                
+
                 if (i % 100 == 0) {
                     System.out.println("Выполнено экспериментов: " + i + "/" + dataset.length);
                 }
             }
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -140,19 +140,19 @@ public class TriangleExperiment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         double[][] pointsArray = points.toArray(new double[0][]);
         byte[] labelsArray = new byte[labels.size()];
         for (int i = 0; i < labels.size(); i++)
             labelsArray[i] = labels.get(i);
-        
+
         return new DatasetWithLabels(pointsArray, labelsArray);
     }
 
     public static class DatasetWithLabels {
         public double[][] points;
         public byte[] labels;
-        
+
         public DatasetWithLabels(double[][] points, byte[] labels) {
             this.points = points;
             this.labels = labels;
@@ -162,16 +162,16 @@ public class TriangleExperiment {
         ModelFabric fabric = new MultipleTriangleModelFabric(ModelLoader.load("src/main/resources/two-triangles/two-triangle.zip"));
         ModelPredictor predictor = fabric.createPredictor();
         WeightsManager weightsManager = fabric.createWeightsManager();
-        
+
         TriangleExperiment experiment = new TriangleExperiment(predictor);
-        
+
         DatasetWithLabels data = loadDatasetWithLabels("src/main/resources/two-triangles/dataset.csv");
-        
+
         double[] rotationAngles = {0.2};
 
         for (double angle : rotationAngles) {
             String outputPath = String.format("two_triangle_experiment_shear.csv");
-            experiment.runExperiments(weightsManager, data.points, data.labels, angle, outputPath);   
+            experiment.runExperiments(weightsManager, data.points, data.labels, angle, outputPath);
         }
     }
 }

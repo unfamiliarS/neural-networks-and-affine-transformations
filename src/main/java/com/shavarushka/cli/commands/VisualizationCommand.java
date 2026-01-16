@@ -50,27 +50,27 @@ class VisualizationCommand implements Command {
             String datasetPath = Models.get(requiredArgs.get("model")).getDatasetPath();
 
             ProcessBuilder pb = buildPythonCommand(datasetPath, weightsStr, biasesStr);
-            
+
             Process process = pb.start();
-            
+
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            
+
             StringBuilder errorOutput = new StringBuilder();
-            
+
             String line;
             while ((line = errorReader.readLine()) != null)
                 errorOutput.append(line).append("\n");
-            
+
             int exitCode = process.waitFor();
-            
+
             if (errorOutput.length() > 0) {
                 System.err.println("Python script errors:");
                 System.err.println(errorOutput.toString());
             }
-            
+
             if (exitCode != 0)
-                System.err.println("Python script exited with error code: " + exitCode);    
-            
+                System.err.println("Python script exited with error code: " + exitCode);
+
             errorReader.close();
 
         } catch (Exception e) {
@@ -143,7 +143,7 @@ class VisualizationCommand implements Command {
                 }
                 break;
         }
-        
+
         return pb;
     }
 }

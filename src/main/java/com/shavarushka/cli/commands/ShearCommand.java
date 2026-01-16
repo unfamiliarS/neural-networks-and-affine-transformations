@@ -97,9 +97,9 @@ public class ShearCommand implements Command {
         if (matrix == null || matrix.length == 0 || matrix[0] == null) {
             return "";
         }
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         int rowsToShow = Math.min(count, matrix.length);
         for (int i = 0; i < rowsToShow; i++) {
             int colsToShow = Math.min(count, matrix[i].length);
@@ -109,20 +109,20 @@ public class ShearCommand implements Command {
                     sb.append(" ");
                 }
             }
-            
+
             if (matrix[i].length > colsToShow) {
                 sb.append(" ...");
             }
-            
+
             if (i < rowsToShow - 1) {
                 sb.append("\n");
             }
         }
-        
+
         if (matrix.length > rowsToShow) {
             sb.append("\n...");
         }
-        
+
         return sb.toString();
     }
 }

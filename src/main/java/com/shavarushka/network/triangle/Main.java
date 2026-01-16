@@ -26,8 +26,8 @@ public class Main {
         System.out.println();
         weightsManager.printWeights();
         System.out.println();
-        
-        
+
+
         double[][] dataset = TriangleDataGenerator.getFromCSV("src/main/python/triangle/dataset.csv");
         affineTransformation.setMatrixType(true);
         double[][] rotatedDataSet = affineTransformation.transform(dataset);
@@ -36,7 +36,7 @@ public class Main {
         double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
 
         MatrixUtils.printMatrix(neuronActivationHandler.getAllLayerActivationsAsArrays(dataSetSample));
-        
+
         System.out.println("Before weight rotation");
         System.out.println();
         System.out.println(predictor.predict(dataSetSample));

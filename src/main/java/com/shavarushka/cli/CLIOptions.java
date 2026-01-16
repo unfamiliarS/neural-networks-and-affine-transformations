@@ -21,7 +21,7 @@ public interface CLIOptions {
                 .hasArg(true)
                 .argName("model")
                 .valueSeparator('=')
-                .desc("The neuro model you want to work with")
+                .desc("The neuro model you want to work with (triangle, two-triangles, simple-mnist, mnist)")
                 .build());
 
         options.addOption(Option.builder()
@@ -30,7 +30,7 @@ public interface CLIOptions {
                 .hasArg(true)
                 .argName("data")
                 .valueSeparator('=')
-                .desc("Sample data you want to process with the neural network")
+                .desc("Sample data you want to process with the neural network. Point or image")
                 .build());
 
         options.addOption(Option.builder()

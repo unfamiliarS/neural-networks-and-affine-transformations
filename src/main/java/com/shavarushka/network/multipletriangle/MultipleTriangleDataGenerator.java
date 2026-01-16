@@ -23,7 +23,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
     private double[][][] trianglesVertices = {
         {
             {1.0, 1.0},
-            {5.0, 1.0}, 
+            {5.0, 1.0},
             {3.0, 4.0}
         },
         {
@@ -74,7 +74,7 @@ public class MultipleTriangleDataGenerator implements DataGenerator {
     }
 
     private boolean isPointInAnyTriangle(double x, double y) {
-        return isPointInTriangle(x, y, trianglesVertices[0]) || 
+        return isPointInTriangle(x, y, trianglesVertices[0]) ||
                isPointInTriangle(x, y, trianglesVertices[1]);
     }
 

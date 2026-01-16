@@ -28,7 +28,7 @@ def apply_scale(data, scale_x, scale_y, isData=True):
         scale_matrix = np.array([
             [1/scale_x, 0],
             [0, 1/scale_y]
-        ])    
+        ])
     result = scale_matrix @ data.T
     return result.T
 
@@ -64,7 +64,7 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, alpha=0.8, linewid
     x_range = np.linspace(x_min, x_max, 400)
 
     colors = ['red', 'blue', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'magenta']
-    
+
     for neuron_idx in range(len(weights)):
         w1 = weights[neuron_idx][0]
         w2 = weights[neuron_idx][1]
@@ -75,7 +75,7 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, alpha=0.8, linewid
 
         y_line_ext = (-w1 * x_range_ext - b) / w2
         y_line = (-w1 * x_range - b) / w2
-        ax.plot(x_range_ext, y_line_ext, 
+        ax.plot(x_range_ext, y_line_ext,
                 color=line_color, linewidth=linewidth, alpha=alpha, label=label)
 
         valid_indices = (y_line >= y_min) & (y_line <= y_max)
@@ -92,9 +92,9 @@ def plot_decision_boundary(ax, weights, biases, x_lim, y_lim, alpha=0.8, linewid
                 scale = 0.4
                 dx = w1 / norm_length * scale
                 dy = w2 / norm_length * scale
-                ax.arrow(x_mid, y_mid, dx, dy, 
-                        head_width=0.1, head_length=0.1, 
-                        fc='green', ec='green', 
+                ax.arrow(x_mid, y_mid, dx, dy,
+                        head_width=0.1, head_length=0.1,
+                        fc='green', ec='green',
                         alpha=0.7, width=0.05)
 
     if len(weights) > 0:
@@ -109,16 +109,16 @@ def main():
     parser.add_argument('--angle', type=float, default=30)
     parser.add_argument('--scale', type=float, default=1.5)
     parser.add_argument('--shear', type=float, default=0.3)
-    
+
     args = parser.parse_args()
-    
+
     weights_layer0, biases_layer0 = parse_weights_biases(args.weights, args.biases)
 
     df = pd.read_csv(args.dataset, header=None, names=['x', 'y', 'class', 'class_name'])
     df['x'] = pd.to_numeric(df['x'], errors='coerce')
     df['y'] = pd.to_numeric(df['y'], errors='coerce')
     df['class'] = pd.to_numeric(df['class'], errors='coerce')
-    
+
     df = df.dropna()
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
@@ -143,13 +143,13 @@ def main():
     ax2.set_ylabel('Y')
     ax2.grid(True, alpha=0.3)
     ax2.set_aspect('equal')
-    
+
     data_points = df[['x', 'y']].values
     if args.affineTransformation == 'rotate':
         transformed_data = apply_rotation(data_points, args.angle)
         transformed_weights = apply_rotation(np.array(weights_layer0), args.angle)
         ax2.set_title(f'Rotated Data (angle={args.angle}°)')
-        
+
     elif args.affineTransformation == 'scale':
         transformed_data = apply_scale(data_points, args.scale, args.scale)
         transformed_weights = apply_scale(np.array(weights_layer0), args.scale, args.scale, False)
@@ -159,16 +159,16 @@ def main():
         transformed_data = apply_shear(data_points, args.shear, args.shear)
         transformed_weights = apply_shear(np.array(weights_layer0), args.shear, args.shear, False)
         ax2.set_title(f'Sheared Data (shear_x={args.shear}, shear_y={args.shear})')
-    
-    ax2.scatter(transformed_data[:, 0], transformed_data[:, 1], 
+
+    ax2.scatter(transformed_data[:, 0], transformed_data[:, 1],
                 c=colors, alpha=0.7, s=30, edgecolors='black', linewidth=0.5)
-    
+
     x_min_t, x_max_t = safe_limits(transformed_data[:, 0])
     y_min_t, y_max_t = safe_limits(transformed_data[:, 1])
-    
+
     ax2.set_xlim(x_min_t, x_max_t)
     ax2.set_ylim(y_min_t, y_max_t)
-    
+
     plot_decision_boundary(ax2, transformed_weights, biases_layer0, (x_min_t, x_max_t), (y_min_t, y_max_t))
 
     plt.tight_layout()

@@ -56,7 +56,7 @@ public class WeightsManager {
         double[] biasesArray = new double[(int) biases.length()];
         for (int i = 0; i < biases.length(); i++)
             biasesArray[i] = biases.getDouble(i);
-        
+
         return biasesArray;
     }
 

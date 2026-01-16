@@ -45,12 +45,12 @@ public class DataOptionValidator extends BaseOptionValidator {
     }
 
     private boolean isImageModel(Models modelType) {
-        return modelType.equals(MNIST) || 
+        return modelType.equals(MNIST) ||
             modelType.equals(SIMPLE_MNIST);
     }
 
     private boolean isPointModel(Models modelType) {
-        return modelType.equals(TRIANGLE) || 
+        return modelType.equals(TRIANGLE) ||
             modelType.equals(TWO_TRIANGLES);
     }
 

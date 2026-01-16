@@ -22,17 +22,17 @@ public class NeuronActivationHandler {
     public double[][] getAllLayerActivationsAsArrays(double[] inputVector) {
         List<INDArray> activationsArrays = getAllLayerActivations(inputVector);
         double[][] result = new double[activationsArrays.size()][];
-        
+
         for (int i = 0; i < activationsArrays.size(); i++)
             result[i] = activationsArrays.get(i).toDoubleVector();
-        
+
         return result;
     }
 
     public INDArray getLayerActivations(int layerIndex, double[] inputVector) {
         List<INDArray> activations = getAllLayerActivations(inputVector);
         if (layerIndex < 0 || layerIndex >= activations.size()) {
-            throw new IllegalArgumentException("Invalid layer index: " + layerIndex + 
+            throw new IllegalArgumentException("Invalid layer index: " + layerIndex +
                     ". Network has " + activations.size() + " layers.");
         }
         return activations.get(layerIndex);

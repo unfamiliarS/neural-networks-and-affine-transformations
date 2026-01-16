@@ -19,7 +19,7 @@ public class Main {
         WeightsManager weightsManager = fabric.createWeightsManager();
         NeuronActivationHandler neuronActivationHandler = fabric.createNeuronActivationHander();
         MNISTPredictor predictor = (MNISTPredictor) fabric.createPredictor();
-        
+
         double rotationDegr = 256;
         ShearAffineTransformation affineTransformation = new ShearAffineTransformation()
                                                     .shear(0.02);

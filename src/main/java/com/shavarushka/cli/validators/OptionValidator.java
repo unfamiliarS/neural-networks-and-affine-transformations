@@ -5,7 +5,7 @@ import org.apache.commons.cli.CommandLine;
 import com.shavarushka.cli.validators.exceptions.OptionValidationException;
 
 public interface OptionValidator {
-    
+
     void validate() throws OptionValidationException;
 
     public static OptionValidator createDefaultValidationChain(CommandLine args) {

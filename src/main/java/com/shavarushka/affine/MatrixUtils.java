@@ -20,7 +20,7 @@ public class MatrixUtils {
         SimpleMatrix coords = new SimpleMatrix(coordinates);
 
         SimpleMatrix result = rot.mult(coords.transpose());
-        
+
         return result.transpose().toArray2();
     }
 

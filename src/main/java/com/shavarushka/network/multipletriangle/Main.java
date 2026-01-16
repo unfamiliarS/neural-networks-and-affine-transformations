@@ -31,7 +31,7 @@ public class Main {
         System.out.println("Data sample: " + Arrays.toString(dataset[dataSetSampleIndex]) + "\n");
         double[] dataSetSample = dataset[dataSetSampleIndex];
         double[] rotatedDataSetSample = rotatedDataSet[dataSetSampleIndex];
-        
+
         System.out.println("Before weight rotation");
         System.out.println();
         System.out.println("Neuron activations:");

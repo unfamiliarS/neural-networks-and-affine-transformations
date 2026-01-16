@@ -68,7 +68,7 @@ public class RotationCommand implements Command {
         System.out.println("-".repeat(30) + "Prediction:" + "-".repeat(30));
         System.out.println(predictor.predict(data));
         System.out.println("\n");
-        
+
         double[] rotatedData = affineTransformation.transform(new double[][]{data})[0];
         double[][] rotatedWeights = affineTransformation.transform(origLayerWeights);
 
@@ -95,9 +95,9 @@ public class RotationCommand implements Command {
         if (matrix == null || matrix.length == 0 || matrix[0] == null) {
             return "";
         }
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         int rowsToShow = Math.min(count, matrix.length);
         for (int i = 0; i < rowsToShow; i++) {
             int colsToShow = Math.min(count, matrix[i].length);
@@ -107,20 +107,20 @@ public class RotationCommand implements Command {
                     sb.append(" ");
                 }
             }
-            
+
             if (matrix[i].length > colsToShow) {
                 sb.append(" ...");
             }
-            
+
             if (i < rowsToShow - 1) {
                 sb.append("\n");
             }
         }
-        
+
         if (matrix.length > rowsToShow) {
             sb.append("\n...");
         }
-        
+
         return sb.toString();
     }
 }
