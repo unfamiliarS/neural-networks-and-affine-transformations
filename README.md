@@ -28,5 +28,5 @@ cp -r src/main/resources/* $HOME/.local/affine/
 Use affine-network script
 ```
 chmod +x affine-network
-./affine-network
+./affine-network --model=two-triangle --data=3.0,3.0 --rotate=125
 ```
