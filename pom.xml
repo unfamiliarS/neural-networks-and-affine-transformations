@@ -37,7 +37,6 @@
     </dependencies>
 
     <build>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -46,9 +45,7 @@
                 </includes>
             </resource>
         </resources>
-
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -60,7 +57,7 @@
                         </manifest>
                     </archive>
                     <descriptors>
-                        <descriptor>src/main/assembly/custom-assembly.xml</descriptor>
+                        <descriptor>assembly/custom-assembly.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
@@ -72,7 +69,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 

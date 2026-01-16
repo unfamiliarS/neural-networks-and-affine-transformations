@@ -1,4 +1,4 @@
-package com.shavarushka.network.binary;
+package com.shavarushka.network.simple_binary;
 
 import java.io.File;
 import java.io.IOException;
