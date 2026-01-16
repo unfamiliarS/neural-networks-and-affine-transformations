@@ -8,6 +8,10 @@
     <artifactId>neural-networks-and-affine-transformations</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <name>Neural Networks and Affine Transformations</name>
+    <description>Research work on the possibility of applying affine transformations to fully connected neural networks</description>
+    <url>https://github.com/unfamiliarS/neural-networks-and-affine-transformations</url>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
